@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0A1220">
+<title>Портфолио — LentiVa</title>
+<meta name="description" content="Проекты жилых и коммерческих интерьеров: квартиры, дома, кофейни и салоны.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230A1220'/%3E%3Cpath d='M16 7l7 9-7 9-7-9z' fill='%23C8A253'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:title" content="Портфолио — LentiVa">
+<meta property="og:description" content="Проекты жилых и коммерческих интерьеров: квартиры, дома, кофейни и салоны.">
+<!-- после публикации добавьте абсолютные адреса, иначе превью в Telegram будет пустым:
+<meta property="og:url" content="https://ваш-домен.ru/">
+<meta property="og:image" content="https://ваш-домен.ru/preview.jpg"> -->
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/base.css">
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+<header class="top">
+  <div class="topin">
+    <a class="brand" href="index.html"><span>◆</span>LentiVa</a>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="nav" aria-label="Меню">☰</button>
+    <nav class="nav" id="nav">
+      <a href="index.html">Главная</a>
+      <a href="portfolio.html" aria-current="page">Портфолио</a>
+      <a href="ruletka.html">Рулетка</a>
+      <a href="services.html">Услуги и цены</a>
+      <a class="tg" href="https://t.me/vtestov" target="_blank" rel="noopener">Написать</a>
+    </nav>
+  </div>
+</header>
+<main>
+<div class="wrap wide-wrap">
+
+  <section class="sec">
+    <p class="eyebrow">lentiva · работы</p>
+    <h1>Портфолио</h1>
+    <div class="dash"><i></i><span>◆</span><i></i></div>
+    <p class="lede">Дизайн-проекты и визуализации жилых и коммерческих пространств. Карточка открывает полный проект на Behance — с планировками, развёртками и рендерами.</p>
+  </section>
+
+  <section class="sec">
+    <div class="filters" role="group" aria-label="Фильтр проектов">
+      <button type="button" data-filter="all" aria-pressed="true">все</button>
+      <button type="button" data-filter="flat" aria-pressed="false">квартиры</button>
+      <button type="button" data-filter="com" aria-pressed="false">коммерция</button>
+      <button type="button" data-filter="viz" aria-pressed="false">визуализация</button>
+    </div>
+    <!-- Обложки подтягиваются с Behance. Чтобы не зависеть от него:
+         скачайте картинки, положите в assets/img/ и замените src на assets/img/имя.jpg -->
+    <div class="works">
+      <a class="work" href="https://www.behance.net/gallery/245546101/Interior-design-project-of-a-laser-tag-club" target="_blank" rel="noopener" data-type="com">
+        <img src="https://mir-s3-cdn-cf.behance.net/projects/404/1e62f3245546101.Y3JvcCwxOTk5LDE1NjQsMCwyMTI.png" alt="Лазертаг-клуб" loading="lazy" referrerpolicy="no-referrer">
+        <div class="wmeta"><b>Лазертаг-клуб</b><span>Коммерция · развлекательное пространство</span></div>
+      </a>
+      <a class="work" href="https://www.behance.net/gallery/211543279/Computer-club-design-project-in-cyberpunk-style" target="_blank" rel="noopener" data-type="com">
+        <img src="https://mir-s3-cdn-cf.behance.net/projects/404/9669a0211543279.Y3JvcCwxMzgwLDEwODAsNTM2LDA.png" alt="Компьютерный клуб в киберпанке" loading="lazy" referrerpolicy="no-referrer">
+        <div class="wmeta"><b>Компьютерный клуб в киберпанке</b><span>Коммерция · дипломный проект</span></div>
+      </a>
+      <a class="work" href="https://www.behance.net/gallery/208942091/Design-project-of-Jungle-cafe-in-eco-style" target="_blank" rel="noopener" data-type="com">
+        <img src="https://mir-s3-cdn-cf.behance.net/projects/404/e13e3b208942091.Y3JvcCwxMjAwLDkzOCwwLDQzMw.png" alt="Кафе «Jungle» в эко-стиле" loading="lazy" referrerpolicy="no-referrer">
+        <div class="wmeta"><b>Кафе «Jungle» в эко-стиле</b><span>Коммерция · кафе</span></div>
+      </a>
+      <a class="work" href="https://www.behance.net/gallery/211330501/Apartment-design-project-in-industrial-style" target="_blank" rel="noopener" data-type="flat">
+        <img src="https://mir-s3-cdn-cf.behance.net/projects/404/24709c211330501.Y3JvcCwxMDA3LDc4OCwxOTcsMA.png" alt="Квартира в индустриальном стиле" loading="lazy" referrerpolicy="no-referrer">
+        <div class="wmeta"><b>Квартира в индустриальном стиле</b><span>Жильё · однокомнатная · дизайн-проект</span></div>
+      </a>
+      <a class="work" href="https://www.behance.net/gallery/225806117/Design-of-a-two-room-apartment-in-wabi-sabi-style" target="_blank" rel="noopener" data-type="flat">
+        <img src="https://mir-s3-cdn-cf.behance.net/projects/404/dc5788225806117.Y3JvcCwxMjM2LDk2NywyODUwLDQ4Ng.jpg" alt="Двухкомнатная в стиле вабисаби" loading="lazy" referrerpolicy="no-referrer">
+        <div class="wmeta"><b>Двухкомнатная в стиле вабисаби</b><span>Жильё · двухкомнатная · дизайн-проект</span></div>
+      </a>
+      <a class="work" href="https://www.behance.net/gallery/229366911/Design-project-of-a-two-room-apartment-in-English-style" target="_blank" rel="noopener" data-type="flat">
+        <img src="https://mir-s3-cdn-cf.behance.net/projects/404/33046e229366911.Y3JvcCwxNDM2LDExMjMsMzE3Niw0Mzc.jpg" alt="Двухкомнатная в английском стиле" loading="lazy" referrerpolicy="no-referrer">
+        <div class="wmeta"><b>Двухкомнатная в английском стиле</b><span>Жильё · двухкомнатная · дизайн-проект</span></div>
+      </a>
+      <a class="work" href="https://www.behance.net/gallery/229622073/Scandinavian-one-room-apartment-design-(visualization)" target="_blank" rel="noopener" data-type="viz">
+        <img src="https://mir-s3-cdn-cf.behance.net/projects/404/ee26f2229622073.Y3JvcCwxMDA3LDc4OCwzNTksMA.png" alt="Однушка в скандинавском стиле" loading="lazy" referrerpolicy="no-referrer">
+        <div class="wmeta"><b>Однушка в скандинавском стиле</b><span>Визуализация · интерьер квартиры</span></div>
+      </a>
+      <a class="work" href="https://www.behance.net/gallery/235957643/Unfinished-kitchen-living-visualization-for-employment" target="_blank" rel="noopener" data-type="viz">
+        <img src="https://mir-s3-cdn-cf.behance.net/projects/404/784f36235957643.Y3JvcCwxMDA3LDc4OCwxOTcsMA.png" alt="Кухня-гостиная" loading="lazy" referrerpolicy="no-referrer">
+        <div class="wmeta"><b>Кухня-гостиная</b><span>Визуализация · тестовое задание</span></div>
+      </a>
+    </div>
+  </section>
+
+  <div class="cta">
+    <h2 style="margin-bottom:10px">Хотите так же?</h2>
+    <p>Напишите, какое у вас помещение и что не устраивает сейчас. Посмотрю планировку и скажу, с чего начинать.</p>
+    <div class="btns"><a class="btn solid" href="https://t.me/vtestov" target="_blank" rel="noopener">Написать в Telegram</a></div>
+  </div>
+</div>
+</main>
+<footer class="foot">
+  <div class="footin">
+    <div class="fb">LentiVa</div>
+    <nav><a href="index.html">Главная</a><a href="portfolio.html">Портфолио</a><a href="ruletka.html">Рулетка</a><a href="services.html">Услуги и цены</a></nav>
+    <div class="fcontact">
+      <span>Связаться: <a href="https://t.me/vtestov" target="_blank" rel="noopener">t.me/vtestov</a></span>
+      <span class="cp">© 2026 LentiVa · дизайн интерьера</span>
+    </div>
+  </div>
+</footer>
+<script src="assets/site.js"></script>
+</body>
+</html>

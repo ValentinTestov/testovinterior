@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0A1220">
+<title>Рулетка интерьера — LentiVa</title>
+<meta name="description" content="Выберите объект и получите интерьерное направление: стиль, палитру, освещение и ключевые решения.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230A1220'/%3E%3Cpath d='M16 7l7 9-7 9-7-9z' fill='%23C8A253'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:title" content="Рулетка интерьера — LentiVa">
+<meta property="og:description" content="Выберите объект и получите интерьерное направление: стиль, цвета, освещение и ключевые решения.">
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+/* стили только этой страницы, общее — в assets/base.css */
+.pick{margin-top:30px;border:1px solid var(--soft);padding:16px}
+.plab{font-family:var(--roman);font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--brass);margin-bottom:12px}
+.plab.sub{color:var(--dim);margin-top:18px}
+.seg{display:flex;border:1px solid var(--line);width:fit-content;max-width:100%}
+.seg button{font-family:var(--roman);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+  background:none;border:0;border-right:1px solid var(--soft);color:var(--dim);padding:11px 18px;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--brass);color:#0C1220}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px;margin-top:12px}
+.chip{font-family:var(--util);font-size:13px;text-align:left;background:none;border:1px solid var(--soft);
+  color:var(--cream);padding:11px 12px;cursor:pointer;transition:border-color .2s ease,background .2s ease}
+.chip:hover{border-color:var(--line)}
+.chip[aria-pressed="true"]{border-color:var(--brass);background:rgba(200,162,83,.10);color:var(--brass-hi)}
+.chips.small{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}
+.chips.small .chip{text-align:center;font-size:12px;padding:9px 8px}
+
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:22px 0 12px}
+.pill{font-family:var(--roman);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  background:none;border:1px solid var(--soft);color:var(--dim);padding:10px 15px;cursor:pointer}
+.pill:hover{border-color:var(--line);color:var(--cream)}
+.pill[aria-pressed="true"]{border-color:var(--brass);color:var(--brass)}
+.count{margin-left:auto;font-family:var(--roman);font-size:11px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase}
+
+.frame{position:relative;padding:9px;border:1px solid var(--soft)}
+.frame::before{content:"";position:absolute;inset:4px;border:1px solid var(--soft);pointer-events:none}
+.cnr{position:absolute;width:15px;height:15px;border:0 solid var(--brass);pointer-events:none}
+.cnr.tl{top:-1px;left:-1px;border-top-width:2px;border-left-width:2px}
+.cnr.tr{top:-1px;right:-1px;border-top-width:2px;border-right-width:2px}
+.cnr.bl{bottom:-1px;left:-1px;border-bottom-width:2px;border-left-width:2px}
+.cnr.br{bottom:-1px;right:-1px;border-bottom-width:2px;border-right-width:2px}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--soft)}
+.cell{background:var(--panel);padding:16px 16px 18px;position:relative;cursor:pointer;user-select:none;
+  -webkit-tap-highlight-color:transparent;transition:background .3s ease}
+.cell.wide{grid-column:1/-1}
+.cell:focus-visible{outline:1px solid var(--brass);outline-offset:-3px}
+.cell .mk{position:absolute;width:9px;height:9px;border:0 solid var(--brass);opacity:.28;transition:opacity .3s ease}
+.cell .mk.a{top:8px;left:8px;border-top-width:1px;border-left-width:1px}
+.cell .mk.b{top:8px;right:8px;border-top-width:1px;border-right-width:1px}
+.cell .mk.c{bottom:8px;left:8px;border-bottom-width:1px;border-left-width:1px}
+.cell .mk.d{bottom:8px;right:8px;border-bottom-width:1px;border-right-width:1px}
+.cell.locked .mk{opacity:1}
+.cell.locked{background:#13203A}
+.cell.stopped .mk{animation:mkflash .7s ease}
+@keyframes mkflash{0%{opacity:1}100%{opacity:.28}}
+
+.head{display:flex;align-items:center;gap:8px;font-family:var(--roman);font-size:11px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--dim);padding:0 10px}
+.head .ix{color:var(--brass);opacity:.7}
+.head .lk{margin-left:auto;font-size:10px;letter-spacing:.14em;color:var(--brass);opacity:0;transition:opacity .25s ease}
+.cell.locked .head{color:var(--brass)}
+.cell.locked .head .lk{opacity:1}
+
+.window{position:relative;height:var(--wh);overflow:hidden;margin-top:12px;contain:paint;
+  background:linear-gradient(180deg,#070E1A 0%,#1A2942 50%,#070E1A 100%);
+  border-top:1px solid var(--soft);border-bottom:1px solid var(--soft)}
+.veil{position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:linear-gradient(180deg,rgba(7,14,26,.97) 0%,rgba(7,14,26,.5) 20%,rgba(7,14,26,0) 38%,rgba(7,14,26,0) 62%,rgba(7,14,26,.5) 80%,rgba(7,14,26,.97) 100%)}
+.pay{position:absolute;left:10px;right:10px;top:50%;height:1px;z-index:2;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--soft),transparent);opacity:.8}
+.cell.stopped .pay{animation:payflash .6s ease}
+@keyframes payflash{0%{background:linear-gradient(90deg,transparent,var(--brass),transparent);opacity:1}100%{opacity:.8}}
+.sheen{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;
+  background:linear-gradient(180deg,transparent 34%,rgba(234,217,172,.10) 50%,transparent 66%)}
+.cell.spinning .sheen{opacity:1;will-change:transform;animation:sheen 1.15s linear infinite}
+@keyframes sheen{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+.reel{position:relative;z-index:1;backface-visibility:hidden;transform:translate3d(0,0,0);transition:opacity .2s ease}
+.cell.spinning .reel{will-change:transform;opacity:.94}
+
+.slot{height:var(--wh);display:flex;flex-direction:column;justify-content:center;gap:8px;padding:0 10px}
+.v{font-family:var(--disp);font-weight:500;text-transform:uppercase;line-height:1.1;letter-spacing:.1em;color:var(--cream)}
+.v.s1{font-size:clamp(21px,5.2vw,30px)}
+.v.s2{font-size:clamp(17px,4.2vw,24px)}
+.v.s3{font-size:clamp(14px,3.4vw,19px)}
+.v.idle{color:var(--brass);opacity:.5;letter-spacing:.5em}
+.m{font-size:13px;font-weight:400;color:var(--dim);letter-spacing:.02em;line-height:1.4}
+.m b{color:var(--brass-hi);font-weight:500}
+.sw{display:flex;gap:5px;height:30px}
+.sw i{flex:1;border:1px solid rgba(242,238,227,.16)}
+.sw i.empty{background:none;border-style:dashed;border-color:var(--soft)}
+.cell[data-k="pal"] .sw{height:42px}
+.keys{margin:0;padding:0;list-style:none}
+.keys li{font-size:13px;line-height:1.45;color:var(--cream);padding-left:14px;position:relative}
+.keys li::before{content:"◆";position:absolute;left:0;top:0;font-size:7px;line-height:2.4;color:var(--brass)}
+
+.spin{position:relative;width:100%;margin-top:20px;height:74px;cursor:pointer;
+  background:none;border:1px solid var(--brass);color:var(--brass-hi);
+  font-family:var(--disp);font-weight:500;font-size:16px;letter-spacing:.3em;text-transform:uppercase;
+  transition:background .25s ease,color .25s ease,transform .08s ease}
+.spin::before{content:"";position:absolute;inset:4px;border:1px solid var(--soft);pointer-events:none}
+.spin:hover{background:rgba(200,162,83,.10)}
+.spin:active{transform:translateY(2px)}
+.spin:focus-visible{outline:1px solid var(--brass);outline-offset:4px}
+.spin[disabled]{opacity:.4;cursor:default;border-color:var(--soft);color:var(--dim)}
+.spin .d{font-size:11px;opacity:.7;letter-spacing:0}
+.hintbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px;
+  font-family:var(--roman);font-size:12px;letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
+
+.icard{margin-top:26px;background:var(--panel);opacity:0;transform:translateY(14px);pointer-events:none;
+  transition:opacity .4s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+.icard.on{opacity:1;transform:none;pointer-events:auto}
+.cinner{padding:0 18px 18px}
+.icard .rule{height:2px;background:var(--brass);width:0;transition:width .8s cubic-bezier(.2,.85,.2,1) .06s}
+.icard.on .rule{width:100%}
+.chead{display:flex;justify-content:space-between;gap:12px;font-family:var(--roman);font-size:11px;
+  letter-spacing:.24em;text-transform:uppercase;color:var(--brass);padding:14px 0 8px}
+.crow{display:grid;grid-template-columns:124px 1fr;gap:14px;align-items:start;padding:15px 0;
+  border-top:1px solid var(--soft);clip-path:inset(0 100% 0 0)}
+.icard.on .crow{animation:wipe .6s cubic-bezier(.22,.85,.2,1) forwards}
+@keyframes wipe{to{clip-path:inset(0 0 0 0)}}
+.clbl{font-family:var(--roman);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);padding-top:6px}
+.cval{font-family:var(--disp);font-weight:500;font-size:clamp(16px,4vw,21px);text-transform:uppercase;
+  line-height:1.2;letter-spacing:.08em;color:var(--cream)}
+.cval.big{font-size:clamp(22px,5.6vw,30px)}
+.cmeta{display:block;font-size:13px;color:var(--dim);margin-top:6px;letter-spacing:.02em;line-height:1.45}
+.crow .sw{margin-bottom:9px;height:30px;max-width:300px}
+.crow .keys li{margin-bottom:5px}
+.cexp{display:flex;gap:8px;flex-wrap:wrap;padding-top:16px;border-top:1px solid var(--soft)}
+.ghost{font-family:var(--roman);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  background:none;border:1px solid var(--soft);color:var(--cream);padding:11px 15px;cursor:pointer;
+  text-decoration:none;display:inline-block}
+.ghost:hover{border-color:var(--brass);color:var(--brass)}
+.ghost.gold{border-color:var(--brass);color:var(--brass-hi)}
+.ghost.gold:hover{background:rgba(200,162,83,.12)}
+.icard.shot{animation:shot .55s ease}
+@keyframes shot{0%{background:#2C2A17}100%{background:var(--panel)}}
+
+.arch{margin-top:34px;border-top:1px solid var(--soft);padding-top:18px}
+.ahead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.atitle{font-family:var(--hero);font-size:24px;letter-spacing:.12em;text-transform:uppercase;color:var(--cream)}
+.astat{font-family:var(--roman);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.amode{margin-left:auto;font-size:12px;color:var(--dim)}
+.amode.warn{color:var(--brass)}
+.atools{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:14px 0 4px}
+.arow{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;
+  padding:12px 0;border-top:1px solid var(--soft)}
+.asw{display:flex;gap:3px;width:52px;height:34px}
+.asw i{flex:1;border:1px solid rgba(242,238,227,.16)}
+.amain{min-width:0}
+.aval{display:block;font-family:var(--disp);font-weight:500;font-size:14px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--cream);line-height:1.25}
+.ameta{display:block;font-size:12px;color:var(--dim);margin-top:4px;line-height:1.4}
+.aact{display:flex;gap:5px;align-items:center}
+.aact button{font-family:var(--roman);font-size:11px;letter-spacing:.1em;background:none;
+  border:1px solid var(--soft);color:var(--dim);padding:7px 9px;cursor:pointer}
+.aact button:hover{border-color:var(--brass);color:var(--brass)}
+.astar.on{color:var(--brass);border-color:var(--brass)}
+.aempty{font-size:13px;color:var(--dim);padding:16px 0}
+.amore{width:100%;margin-top:10px}
+details.extra{margin-top:16px;border-top:1px solid var(--soft);padding-top:12px}
+details.extra summary{font-family:var(--roman);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--dim);cursor:pointer;list-style:none}
+details.extra summary::-webkit-details-marker{display:none}
+details.extra summary::before{content:"+ ";color:var(--brass)}
+details.extra[open] summary::before{content:"– "}
+.extrabox{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;align-items:center}
+.exnote{font-size:12px;color:var(--dim);line-height:1.5;margin:10px 0 0;width:100%}
+
+.modal{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:18px;
+  background:rgba(5,9,16,.78);opacity:0;transition:opacity .3s ease}
+.modal[hidden]{display:none}
+.modal.on{opacity:1}
+.mbox{position:relative;width:100%;max-width:420px;background:var(--panel);border:1px solid var(--line);
+  padding:30px 24px 24px;transform:translateY(12px);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.modal.on .mbox{transform:none}
+.mbox::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--brass)}
+.mx{position:absolute;top:8px;right:8px;background:none;border:0;color:var(--dim);font-size:16px;
+  padding:8px 10px;cursor:pointer;line-height:1}
+.mx:hover{color:var(--brass)}
+.mtitle{font-family:var(--hero);font-size:26px;letter-spacing:.08em;text-transform:uppercase;line-height:1.15;color:var(--cream)}
+.mtext{font-size:14px;line-height:1.6;color:#DCD7C9;margin:14px 0 20px}
+.mgo{display:block;text-align:center;font-family:var(--disp);font-weight:500;font-size:14px;letter-spacing:.2em;
+  text-transform:uppercase;color:#0C1220;background:var(--brass);padding:16px;text-decoration:none}
+.mgo:hover{background:var(--brass-hi)}
+.mless{display:block;width:100%;margin-top:10px;background:none;border:0;color:var(--dim);
+  font-family:var(--roman);font-size:12px;letter-spacing:.16em;text-transform:uppercase;padding:12px;cursor:pointer}
+.mless:hover{color:var(--cream)}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);z-index:50;
+  background:var(--panel-2);border:1px solid var(--line);color:var(--cream);
+  font-family:var(--roman);font-size:12px;letter-spacing:.12em;padding:12px 20px;max-width:calc(100vw - 32px);
+  opacity:0;pointer-events:none;transition:all .25s ease;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:640px){
+  :root{--wh:100px}
+  .wideonly{display:none}
+  .cell[data-k="pal"] .sw{height:30px}
+  body{padding:20px 14px 60px}
+  .grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr;gap:12px}
+  .crow{grid-template-columns:1fr;gap:6px}
+  .clbl{padding-top:0}
+  .fan{height:70px}
+  .chips{grid-template-columns:1fr 1fr}
+  .chips.small{grid-template-columns:repeat(3,1fr)}
+  .arow{grid-template-columns:auto 1fr}
+  .aact{grid-column:1/-1;flex-wrap:wrap}
+  .seg{width:100%}
+  .seg button{flex:1;padding:11px 8px;letter-spacing:.12em}
+}
+@media (prefers-reduced-motion:reduce){
+  .cell.stopped .mk,.cell.stopped .pay,.cell.spinning .sheen{animation:none}
+  .icard,.icard .rule,.modal,.mbox{transition:none}
+  .icard.on .crow{animation:none;clip-path:inset(0 0 0 0)}
+}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+<header class="top">
+  <div class="topin">
+    <a class="brand" href="index.html"><span>◆</span>LentiVa</a>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="nav" aria-label="Меню">☰</button>
+    <nav class="nav" id="nav">
+      <a href="index.html">Главная</a>
+      <a href="portfolio.html">Портфолио</a>
+      <a href="ruletka.html" aria-current="page">Рулетка</a>
+      <a href="services.html">Услуги и цены</a>
+      <a class="tg" href="https://t.me/vtestov" target="_blank" rel="noopener">Написать</a>
+    </nav>
+  </div>
+</header>
+<main>
+<div class="wrap">
+
+  <div class="fan">
+    <svg viewBox="0 0 600 96" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+      <g stroke="#C8A253" stroke-width="1" fill="none" opacity=".55">
+        <g transform="rotate(-72 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(-60 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(-48 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(-36 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(-24 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(-12 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <line x1="300" y1="96" x2="300" y2="2"/>
+        <g transform="rotate(12 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(24 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(36 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(48 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(60 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(72 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+      </g>
+      <g stroke="#C8A253" fill="none" opacity=".5">
+        <path d="M180 96 A120 120 0 0 1 420 96"/>
+        <path d="M212 96 A88 88 0 0 1 388 96"/>
+      </g>
+    </svg>
+  </div>
+
+  <p class="eyebrow">lentiva · интерьерный генератор</p>
+  <h1>Рулетка<br>интерьера</h1>
+  <div class="dash"><i></i><span>◆</span><i></i></div>
+
+  <p class="lede">Не знаете, с какого интерьера начать? Выберите своё пространство и получите интерьерное направление: стиль, цвета, освещение и несколько решений для планировки и атмосферы. Понравившуюся идею можно сохранить и использовать как отправную точку для будущего проекта.</p>
+
+  <ol class="steps">
+    <li><span class="num">I</span> Выберите объект — квартиру, дом или коммерческое помещение.</li>
+    <li><span class="num">II</span> Запустите рулетку и получите готовое направление.</li>
+    <li><span class="num">III</span> Сохраните идею или зафиксируйте то, что понравилось, и докрутите остальное.</li>
+  </ol>
+
+  <section class="pick">
+    <div class="plab">Ваш объект</div>
+    <div class="seg" id="grp" role="group" aria-label="Тип помещения">
+      <button type="button" data-grp="res" aria-pressed="true">Жильё</button>
+      <button type="button" data-grp="com" aria-pressed="false">Коммерция</button>
+    </div>
+    <div class="chips" id="types"></div>
+    <div class="plab sub">Примерная площадь — необязательно</div>
+    <div class="chips small" id="areas"></div>
+  </section>
+
+  <div class="bar">
+    <button type="button" class="pill" id="wild" aria-pressed="false">удиви меня</button>
+    <button type="button" class="pill" id="sound" aria-pressed="true">звук</button>
+    <span class="count" id="count">идей: 0</span>
+  </div>
+
+  <div class="frame">
+    <i class="cnr tl"></i><i class="cnr tr"></i><i class="cnr bl"></i><i class="cnr br"></i>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <button type="button" class="spin" id="spin" disabled><span class="d">◆</span>&nbsp;&nbsp;получить идею&nbsp;&nbsp;<span class="d">◆</span></button>
+
+  <div class="hintbar"><span id="hint">Выберите объект выше</span></div>
+
+  <div class="icard" id="card" aria-live="polite">
+    <div class="rule"></div>
+    <div class="cinner">
+      <div class="chead"><span id="cnum">ваша идея</span><span>lentiva</span></div>
+      <div id="crows"></div>
+      <div class="cexp">
+        <button type="button" class="ghost" id="png">сохранить png</button>
+        <button type="button" class="ghost" id="fav">☆ в избранное</button>
+        <button type="button" class="ghost" id="copy">скопировать</button>
+        <a class="ghost gold" id="cardcta" href="#" target="_blank" rel="noopener">обсудить эту концепцию</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="arch">
+    <div class="ahead">
+      <span class="atitle">Сохранённые идеи</span>
+      <span class="astat" id="astat"></span>
+      <span class="amode" id="amode"></span>
+    </div>
+    <div class="atools">
+      <button type="button" class="pill" id="fall" aria-pressed="true">все</button>
+      <button type="button" class="pill" id="ffav" aria-pressed="false">★ избранное</button>
+    </div>
+    <div id="alist"></div>
+    <button type="button" class="ghost amore" id="amore">показать ещё</button>
+
+    <details class="extra">
+      <summary>Дополнительно</summary>
+      <div class="extrabox">
+        <button type="button" class="ghost" id="aexport">выгрузить файлом</button>
+        <button type="button" class="ghost" id="aimportbtn">загрузить файл</button>
+        <input type="file" id="aimport" accept=".json,application/json" hidden>
+        <button type="button" class="ghost" id="aclear">очистить историю</button>
+        <p class="exnote" id="exnote"></p>
+      </div>
+    </details>
+  </section>
+
+</div>
+</main>
+<footer class="foot">
+  <div class="footin">
+    <div class="fb">LentiVa</div>
+    <nav><a href="index.html">Главная</a><a href="portfolio.html">Портфолио</a><a href="ruletka.html">Рулетка</a><a href="services.html">Услуги и цены</a></nav>
+    <div class="fcontact">
+      <span>Связаться: <a href="https://t.me/vtestov" target="_blank" rel="noopener">t.me/vtestov</a></span>
+      <span class="cp">© 2026 LentiVa · дизайн интерьера</span>
+    </div>
+  </div>
+</footer>
+
+<div class="modal" id="cta" role="dialog" aria-modal="true" aria-labelledby="ctatitle" hidden>
+  <div class="mbox">
+    <button type="button" class="mx" id="ctax" aria-label="Закрыть">✕</button>
+    <div class="mtitle" id="ctatitle">Понравилась одна из идей?</div>
+    <p class="mtext">Сохраните карточку и пришлите её мне. Разберём, что именно вам понравилось, и превратим это направление в интерьер уже под ваше помещение.</p>
+    <a class="mgo" id="ctago" href="#" target="_blank" rel="noopener">Обсудить эту идею</a>
+    <button type="button" class="mless" id="ctano">Продолжить крутить</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/site.js"></script>
+<script>
+(function(){
+"use strict";
+
+/* ============ контакт: замените на свой ============ */
+var CONTACT_URL='https://t.me/vtestov';
+
+/* ============ данные ============ */
+var TEMP={
+  2700:'Очень тёплый свет — для спален и зон отдыха',
+  3000:'Тёплый свет для спокойной жилой атмосферы',
+  3500:'Нейтрально-тёплый свет — универсальный сценарий',
+  4000:'Нейтральный свет для рабочих и торговых зон',
+  4500:'Ровная цветопередача для медицинских кабинетов'
+};
+
+var PAL={
+ warmneutral:{char:'Тёплая нейтральная',c:[['молочный','#EDE4D6'],['дуб','#C3A279'],['песочный','#D9C8AD'],['графит','#3A3B38']],
+   names:['Тёплый нейтрал','Натуральный баланс','Мягкий свет']},
+ oakolive:{char:'Тёплая природная',c:[['молочный','#EDE4D6'],['дуб','#C3A279'],['песочный','#D9C8AD'],['оливковый','#7C8465'],['графит','#3A3B38']],
+   names:['Природный баланс','Оливковый покой','Тихий сад']},
+ milkmin:{char:'Светлая молочная',c:[['белый','#F4F1EA'],['светлый дуб','#DAC5A2'],['тёплый серый','#B9B6AF']],
+   names:['Молочный минимализм','Светлый ритм','Белая тишина']},
+ graphite:{char:'Графитовая',c:[['белый','#EEF0F1'],['светло-серый','#C6CACC'],['графит','#3C4145'],['чёрный','#1B1D1F']],
+   names:['Городской графит','Мягкий контраст','Тихий монохром']},
+ sandterra:{char:'Тёплая земляная',c:[['крем','#EFE3D3'],['песочный','#D9C09A'],['терракота','#B5643F'],['глина','#8E6B57']],
+   names:['Тёплая глина','Южный вечер','Земляной тон']},
+ deepgreen:{char:'Глубокая зелёная',c:[['крем','#EDE7DA'],['шалфей','#A3B29C'],['бутылочный','#2E4237'],['латунь','#B2914E']],
+   names:['Тихий модерн','Зелёная глубина','Ботанический вечер']},
+ bluegrey:{char:'Прохладная дымчатая',c:[['лёд','#D8E1E8'],['дымчато-синий','#6E86A0'],['песок','#D5C7AE'],['графит','#3A4147']],
+   names:['Северный свет','Дымчатая прохлада','Морской воздух']},
+ darkwood:{char:'Тёмное дерево',c:[['крем','#E8DECB'],['орех','#6B4A32'],['охра','#B5873A'],['графит','#33322F']],
+   names:['Тёмное дерево','Тёплый орех','Клубный вечер']},
+ concrete:{char:'Бетон и сталь',c:[['бетон','#B9B7B0'],['сталь','#6E7378'],['графит','#35393C'],['кирпич','#9E5B4A']],
+   names:['Городской лофт','Бетонный минимализм','Индустриальный ритм']},
+ plaster:{char:'Светлая штукатурка',c:[['известь','#EFEBE3'],['беж','#DCD2C2'],['тёплый серый','#A9A296'],['дерево','#C1A47C']],
+   names:['Матовая тишина','Средиземный покой','Мягкий свет']},
+ blackbrass:{char:'Чёрный с латунью',c:[['чёрный','#17191B'],['латунь','#C8A253'],['крем','#EFE6D4'],['дым','#7C7F84']],
+   names:['Чёрный лак','Латунный акцент','Вечерний бархат']},
+ pastel:{char:'Мягкая пастельная',c:[['пудровый','#E6CFC6'],['крем','#F2EAE0'],['серо-голубой','#AFC0C6'],['орех','#8A6A52']],
+   names:['Пудровый свет','Тихое утро','Мягкий контраст']},
+ rustnavy:{char:'Синий с ржавчиной',c:[['тёмно-синий','#2B3A4A'],['ржавый','#A85C3C'],['крем','#EDE3D2'],['латунь','#B08D4F']],
+   names:['Городской курорт','Вечерний синий','Тёплый контраст']},
+ sagecream:{char:'Шалфей и крем',c:[['шалфей','#9FAF9B'],['крем','#F0EADD'],['дуб','#C6A97F'],['графит','#3B3E3B']],
+   names:['Тихий сад','Мятный покой','Природный баланс']},
+ warmgrey:{char:'Тёплая серая',c:[['тёплый серый','#BDB6AC'],['крем','#EDE7DC'],['кофе','#6B5B4E'],['дуб','#C9AE86']],
+   names:['Кофейный тон','Спокойный день','Тёплый нейтрал']}
+};
+
+var STYLE={
+ contemporary:{name:'Contemporary',desc:'Современная база без стилевых крайностей: чистые линии и акцент на планировке',
+   pals:['warmneutral','milkmin','graphite','plaster','warmgrey','bluegrey','sagecream'],temps:[3000,3500,4000],tag:'neutral'},
+ warmmin:{name:'Warm Minimalism',desc:'Минимум предметов, тёплая нейтральная гамма и много воздуха',
+   pals:['warmneutral','milkmin','plaster','warmgrey','oakolive'],temps:[2700,3000,3500],tag:'natural'},
+ japandi:{name:'Japandi',desc:'Спокойная база, дерево, природные фактуры и минимум визуального шума',
+   pals:['warmneutral','oakolive','sagecream','plaster','milkmin'],temps:[2700,3000],tag:'natural'},
+ scandi:{name:'Scandinavian',desc:'Светлая гамма, дерево, простая мебель и много естественного света',
+   pals:['milkmin','warmneutral','bluegrey','sagecream','plaster'],temps:[3000,3500],tag:'natural'},
+ midcentury:{name:'Mid-century modern',desc:'Мебель на тонких ножках, тёплое дерево и графичные силуэты 50–60-х',
+   pals:['darkwood','warmneutral','sagecream','rustnavy','warmgrey'],temps:[2700,3000,3500],tag:'retro'},
+ soft:{name:'Soft Contemporary',desc:'Мягкие формы, приглушённый цвет и тактильные материалы',
+   pals:['pastel','warmneutral','plaster','warmgrey','milkmin'],temps:[2700,3000,3500],tag:'neutral'},
+ organic:{name:'Organic Modern',desc:'Природные материалы, плавные линии и живые фактуры',
+   pals:['oakolive','sagecream','plaster','warmneutral','deepgreen','sandterra'],temps:[2700,3000],tag:'natural'},
+ modclassic:{name:'Modern Classic',desc:'Классическая геометрия в современном исполнении: пропорции и сдержанный декор',
+   pals:['warmgrey','plaster','deepgreen','blackbrass','pastel'],temps:[2700,3000,3500],tag:'classic'},
+ neoclass:{name:'Neoclassical',desc:'Молдинги, симметрия и благородная гамма без музейной тяжести',
+   pals:['plaster','warmgrey','pastel','deepgreen'],temps:[2700,3000],tag:'classic'},
+ wabisabi:{name:'Wabi-Sabi',desc:'Красота неровности: матовые поверхности, ручная фактура, приглушённый цвет',
+   pals:['plaster','oakolive','warmneutral','sagecream','sandterra'],temps:[2700,3000],tag:'natural'},
+ loft:{name:'Loft',desc:'Открытое пространство, честные материалы и высокие потолки',
+   pals:['concrete','darkwood','graphite','rustnavy'],temps:[3000,3500,4000],tag:'raw'},
+ industrial:{name:'Industrial',desc:'Бетон, металл и тёмное дерево, контрастный свет и минимум отделки',
+   pals:['concrete','graphite','darkwood'],temps:[3500,4000],tag:'raw'},
+ artdeco:{name:'Art Deco',desc:'Геометрия, глубокий цвет, латунь и лакированные поверхности',
+   pals:['blackbrass','deepgreen','rustnavy','darkwood'],temps:[2700,3000],tag:'classic'},
+ eclectic:{name:'Eclectic',desc:'Смешение эпох и фактур, собранное одной цветовой логикой',
+   pals:['rustnavy','deepgreen','pastel','darkwood','warmgrey'],temps:[2700,3000,3500],tag:'retro'},
+ retro:{name:'Retro / Vintage inspired',desc:'Отсылки к 60–70-м: тёплые цвета, узнаваемые формы, немного игры',
+   pals:['darkwood','rustnavy','sandterra','warmgrey'],temps:[2700,3000],tag:'retro'}
+};
+
+var KEYS={
+ res_s:['встроенное хранение до потолка','мебель-трансформер вместо лишних стен','единое напольное покрытие по всей квартире',
+  'зеркальная плоскость, зрительно удлиняющая комнату','спальня за стеклянной перегородкой','подиум с системой хранения',
+  'компактное рабочее место в нише','скрытые двери в цвет стен','кухня без верхних шкафов','мягкое зонирование светом вместо перегородок'],
+ res_m:['визуальное объединение кухни и гостиной','сценарное освещение в общей зоне','акцентная фактура дерева',
+  'гардеробная вместо шкафа в спальне','единое напольное покрытие в общей зоне','скрытые двери',
+  'ниша с подсветкой в зоне ТВ','отдельное место для работы из дома','приглушённый тихий цвет в спальне','встроенное хранение в прихожей'],
+ res_l:['анфилада общественных зон','панорамное остекление как главный акцент','каминная зона как центр гостиной',
+  'приватное крыло отдельно от общих зон','домашний кабинет со звукоизоляцией','гардеробная-комната',
+  'терраса как продолжение гостиной','лестница как скульптурный объект','несколько групп сценарного света','прихожая с полноценным хранением'],
+ cafe:['акцентная входная группа','барная стойка как главный объект','фотогеничная зона у окна',
+  'износостойкие материалы в проходной зоне','тёплый акцентный свет над столами','посадка разной высоты','акустические панели в потолке'],
+ rest:['сценарное освещение по зонам','приглушённый свет над столами','акустика мягкими материалами',
+  'выделенный маршрут гостя','барная зона как центр зала','полуприватные ниши','фактурный акцент на главной стене'],
+ office:['акустические панели в открытом пространстве','переговорные со стеклом и шторой','зона тихой работы',
+  'понятная навигация по этажу','сочетание общего и локального света','гибкая мебель под перестановки','кухня-лаунж как точка притяжения'],
+ shop:['акцентная входная группа','свет на товаре, а не на проходе','понятная навигация по залу',
+  'фотогеничная зона примерочной','гибкие торговые модули','брендовый цвет в деталях','витрина как сцена'],
+ beauty:['индивидуальный свет у каждого рабочего места','нейтральная цветопередача у зеркал','износостойкие поверхности',
+  'зона ожидания с мягким светом','фотогеничная зона для съёмки работ','акцентный цвет бренда в деталях'],
+ fit:['износостойкие покрытия','акустические решения в зале','зеркала и свет без бликов',
+  'понятная навигация между зонами','раздевалка как отдельный сценарий','акцентный цвет в активной зоне'],
+ clinic:['ровная цветопередача света','понятная навигация для пациента','моющиеся износостойкие материалы',
+  'спокойная зона ожидания','приватность кабинетов','мягкий свет в ожидании и рабочий в кабинете'],
+ hotel:['акцентная входная группа','ресепшн как первый визуальный акцент','сценарное освещение в лобби',
+  'зона ожидания с несколькими сценариями','фотогеничная деталь у входа','износостойкие материалы в проходной зоне'],
+ fun:['сценарное освещение с несколькими режимами','фотогеничная зона','акустические панели',
+  'гибкая мебель под разные форматы','акцентный цвет как узнаваемая деталь','выделенный маршрут посетителя'],
+ studio_com:['гибкая планировка под перестановки','ровный рабочий свет','износостойкие поверхности',
+  'зона хранения оборудования','фотогеничный фон для съёмки','акустическая обработка']
+};
+var KEYS_TAG={
+ raw:['открытые коммуникации как часть эстетики','бетон и металл в отделке'],
+ natural:['натуральные фактуры без глянца','матовая штукатурка на стенах'],
+ classic:['латунные детали в свете и фурнитуре','молдинги в упрощённой геометрии'],
+ retro:['винтажный предмет как акцент','тёплое дерево в мебели'],
+ neutral:['скрытые источники света','единая линия фасадов без ручек']
+};
+
+var OBJ={
+ res:[
+  {id:'studio',l:'Студия',keys:'res_s',temps:[2700,3000,3500],
+   styles:['contemporary','warmmin','japandi','scandi','soft','loft','midcentury','organic']},
+  {id:'k1',l:'1-комнатная квартира',keys:'res_s',temps:[2700,3000,3500],
+   styles:['contemporary','warmmin','japandi','scandi','soft','midcentury','organic','loft']},
+  {id:'k2',l:'2-комнатная квартира',keys:'res_m',temps:[2700,3000,3500],
+   styles:['contemporary','warmmin','japandi','scandi','soft','midcentury','organic','modclassic','loft','eclectic']},
+  {id:'k3',l:'3-комнатная квартира',keys:'res_m',temps:[2700,3000,3500],
+   styles:['contemporary','warmmin','japandi','scandi','soft','midcentury','organic','modclassic','neoclass','eclectic','artdeco']},
+  {id:'k4',l:'4+ комнат',keys:'res_l',temps:[2700,3000,3500],
+   styles:['contemporary','modclassic','neoclass','organic','midcentury','artdeco','eclectic','warmmin']},
+  {id:'pent',l:'Апартаменты / пентхаус',keys:'res_l',temps:[2700,3000,3500],
+   styles:['contemporary','soft','artdeco','modclassic','loft','midcentury','organic']},
+  {id:'house',l:'Загородный дом',keys:'res_l',temps:[2700,3000,3500],
+   styles:['organic','wabisabi','japandi','scandi','modclassic','warmmin','midcentury','eclectic']},
+  {id:'town',l:'Таунхаус',keys:'res_l',temps:[2700,3000,3500],
+   styles:['contemporary','scandi','modclassic','organic','warmmin','midcentury']},
+  {id:'room',l:'Отдельная комната / зона',keys:'res_s',temps:[2700,3000],
+   styles:['contemporary','warmmin','japandi','scandi','soft','organic','wabisabi','midcentury']}
+ ],
+ com:[
+  {id:'cafe',l:'Кафе / кофейня',keys:'cafe',temps:[2700,3000,3500],
+   styles:['contemporary','japandi','organic','loft','industrial','midcentury','retro','wabisabi','soft','scandi']},
+  {id:'rest',l:'Ресторан / бар',keys:'rest',temps:[2700,3000],
+   styles:['artdeco','loft','eclectic','midcentury','contemporary','organic','retro','modclassic']},
+  {id:'office',l:'Офис',keys:'office',temps:[3500,4000],
+   styles:['contemporary','soft','scandi','loft','industrial','midcentury','organic']},
+  {id:'shop',l:'Магазин / шоурум',keys:'shop',temps:[3000,3500,4000],
+   styles:['contemporary','soft','loft','industrial','midcentury','artdeco','organic','scandi']},
+  {id:'beauty',l:'Салон красоты / барбершоп',keys:'beauty',temps:[3000,3500,4000],
+   styles:['contemporary','soft','artdeco','loft','midcentury','organic','industrial']},
+  {id:'fit',l:'Фитнес / wellness',keys:'fit',temps:[3500,4000],
+   styles:['contemporary','loft','industrial','organic','soft','japandi']},
+  {id:'clinic',l:'Клиника / медпространство',keys:'clinic',temps:[4000,4500],
+   styles:['contemporary','soft','scandi','warmmin','organic']},
+  {id:'hotel',l:'Отель / лобби',keys:'hotel',temps:[2700,3000,3500],
+   styles:['contemporary','artdeco','modclassic','midcentury','organic','soft','eclectic']},
+  {id:'fun',l:'Развлекательное пространство',keys:'fun',temps:[2700,3000,3500],
+   styles:['artdeco','loft','eclectic','retro','industrial','midcentury','contemporary']},
+  {id:'studio_com',l:'Студия / сервисное помещение',keys:'studio_com',temps:[3500,4000],
+   styles:['contemporary','loft','industrial','scandi','soft']}
+ ]
+};
+var AREAS={
+ res:[{id:'',l:'не важно'},{id:'s',l:'до 40 м²'},{id:'m',l:'40–70 м²'},{id:'l',l:'70–120 м²'},{id:'xl',l:'120+ м²'}],
+ com:[{id:'',l:'не важно'},{id:'s',l:'до 50 м²'},{id:'m',l:'50–100 м²'},{id:'l',l:'100–200 м²'},{id:'xl',l:'200+ м²'}]
+};
+
+var CELLS=[
+ {k:'concept',ix:'I',label:'Концепция'},
+ {k:'style',ix:'II',label:'Стиль'},
+ {k:'pal',ix:'III',label:'Палитра и свет',wide:true},
+ {k:'keys',ix:'IV',label:'Ключевые решения',wide:true}
+];
+
+/* ============ состояние ============ */
+var grid=document.getElementById('grid');
+var spinBtn=document.getElementById('spin');
+var countEl=document.getElementById('count');
+var toastEl=document.getElementById('toast');
+var hintEl=document.getElementById('hint');
+var wildBtn=document.getElementById('wild');
+
+var state={grp:'res',obj:null,area:'',wild:false,n:0,cur:{},locks:{}};
+var sessionSpins=0;
+var busy=false;
+var reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+/* ============ звук ============ */
+var AC=null,NB=null,unlocked=false,muted=false;
+try{muted=localStorage.getItem('ri_mute')==='1'}catch(e){}
+function ac(){
+  if(muted||!unlocked)return null;
+  if(!AC){
+    var C=window.AudioContext||window.webkitAudioContext;
+    if(!C)return null;
+    AC=new C();
+    var n=Math.floor(AC.sampleRate*0.05),b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0),i;
+    for(i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.6);
+    NB=b;
+  }
+  if(AC.state==='suspended')AC.resume();
+  return AC;
+}
+function tick(at,gain,freq){
+  var c=ac();if(!c)return;
+  var t=c.currentTime+at,s=c.createBufferSource();s.buffer=NB;
+  var f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=freq;f.Q.value=1.3;
+  var g=c.createGain();
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(gain,t+0.004);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+0.05);
+  s.connect(f);f.connect(g);g.connect(c.destination);
+  s.start(t);s.stop(t+0.06);
+}
+function thunk(at){
+  var c=ac();if(!c)return;
+  var t=c.currentTime+at,o=c.createOscillator(),g=c.createGain();
+  o.type='sine';
+  o.frequency.setValueAtTime(200,t);
+  o.frequency.exponentialRampToValueAtTime(84,t+0.14);
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(0.13,t+0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+0.18);
+  o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+0.2);
+  tick(at,0.05,1100);
+}
+function chime(){
+  var c=ac();if(!c)return;
+  [784,1176,1568].forEach(function(f,i){
+    var t=c.currentTime+0.05+i*0.075,o=c.createOscillator(),g=c.createGain();
+    o.type='triangle';o.frequency.value=f;
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(0.05,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.36);
+    o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+0.38);
+  });
+}
+function bezier(x1,y1,x2,y2){
+  function cx(t){return 3*(1-t)*(1-t)*t*x1+3*(1-t)*t*t*x2+t*t*t}
+  function cy(t){return 3*(1-t)*(1-t)*t*y1+3*(1-t)*t*t*y2+t*t*t}
+  return function(x){var lo=0,hi=1,m,i;for(i=0;i<22;i++){m=(lo+hi)/2;if(cx(m)<x)lo=m;else hi=m}return cy((lo+hi)/2)};
+}
+var EASE=bezier(.1,.55,.3,1.07);
+function ticksFor(n,delay,dur){
+  if(muted||!unlocked||n<2)return;
+  var steps=700,k=1,i,x,y;
+  for(i=1;i<=steps&&k<n;i++){
+    x=i/steps;y=EASE(x);
+    while(k<n&&y>=k/(n-1)){tick((delay+x*dur)/1000,0.016+0.03*(k/n),2100+Math.random()*700);k++}
+  }
+}
+function unlock(){if(!unlocked){unlocked=true;ac()}}
+document.addEventListener('pointerdown',unlock);
+document.addEventListener('keydown',unlock);
+
+/* ============ генерация концепции ============ */
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function esc(t){return String(t).replace(/[&<>"']/g,function(m){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
+function objById(id){
+  var g,i;
+  for(g in OBJ)for(i=0;i<OBJ[g].length;i++)if(OBJ[g][i].id===id)return OBJ[g][i];
+  return null;
+}
+function allStyles(){var r=[],k;for(k in STYLE)r.push(k);return r}
+
+function pickStyle(obj,palId){
+  var pool=state.wild?allStyles():(obj.styles||allStyles()).slice();
+  if(palId){
+    var fit=pool.filter(function(s){return STYLE[s].pals.indexOf(palId)>=0});
+    if(fit.length)pool=fit;
+  }
+  if(!pool.length)pool=allStyles();
+  return pick(pool);
+}
+function pickPal(styleId){
+  if(state.wild){var all=[],k;for(k in PAL)all.push(k);return pick(all)}
+  return pick(STYLE[styleId].pals);
+}
+function pickTemp(styleId,obj){
+  var st=STYLE[styleId].temps,ok=obj.temps.filter(function(t){return st.indexOf(t)>=0});
+  return pick(ok.length?ok:obj.temps);
+}
+function pickConcept(palId,styleId,avoid){
+  var pool=PAL[palId].names.filter(function(n){return n!==avoid});
+  if(!pool.length)pool=PAL[palId].names;
+  return pick(pool);
+}
+function keysPool(obj){
+  if(obj.keys.indexOf('res_')===0){
+    if(state.area==='s')return 'res_s';
+    if(state.area==='xl')return 'res_l';
+  }
+  return obj.keys;
+}
+function pickKeys(obj,styleId){
+  var base=(KEYS[keysPool(obj)]||[]).slice(),out=[],extra=KEYS_TAG[STYLE[styleId].tag]||[];
+  if(extra.length&&Math.random()<0.6)out.push(pick(extra));
+  var want=out.length?2:3,i;
+  for(i=0;i<want&&base.length;i++)out.push(base.splice(Math.floor(Math.random()*base.length),1)[0]);
+  if(out.length<3&&base.length)out.push(base.splice(Math.floor(Math.random()*base.length),1)[0]);
+  return out.slice(0,3);
+}
+function makeIdea(){
+  var obj=state.obj,cur=state.cur,L=state.locks;
+  var styleId=(L.style&&cur.style)?cur.style:pickStyle(obj,(L.pal&&cur.pal)?cur.pal:null);
+  var palId=(L.pal&&cur.pal)?cur.pal:pickPal(styleId);
+  var temp=(L.pal&&cur.temp)?cur.temp:pickTemp(styleId,obj);
+  var concept=(L.concept&&cur.concept)?cur.concept:pickConcept(palId,styleId,cur.concept);
+  var keys=(L.keys&&cur.keys)?cur.keys:pickKeys(obj,styleId);
+  return {style:styleId,pal:palId,temp:temp,concept:concept,keys:keys};
+}
+
+/* ============ барабаны ============ */
+function sizeCls(t){var n=t.length;return n<=13?'s1':(n<=22?'s2':'s3')}
+function slotHTML(k,v){
+  if(k==='concept')return '<div class="slot"><div class="v '+sizeCls(v)+'">'+esc(v)+'</div><div class="m">направление интерьера</div></div>';
+  if(k==='style'){var s=STYLE[v];
+    return '<div class="slot"><div class="v '+sizeCls(s.name)+'">'+esc(s.name)+'</div><div class="m">'+esc(s.desc)+'</div></div>'}
+  if(k==='pal'){
+    var p=PAL[v.pal],sw=p.c.map(function(c){return '<i style="background:'+esc(c[1])+'"></i>'}).join('');
+    return '<div class="slot"><div class="sw">'+sw+'</div><div class="m">'+esc(p.c.map(function(c){return c[0]}).join(' / '))
+      +'<span class="wideonly"> · '+esc(p.char.toLowerCase())+'</span> · <b>'+v.temp+' K</b></div></div>';
+  }
+  return '<div class="slot"><ul class="keys">'+v.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>';
+}
+function idleHTML(k){
+  if(k==='pal')return '<div class="slot"><div class="sw"><i class="empty"></i><i class="empty"></i><i class="empty"></i></div><div class="m">выберите объект и нажмите «получить идею»</div></div>';
+  if(k==='keys')return '<div class="slot"><div class="m">здесь появятся решения под ваш объект</div></div>';
+  return '<div class="slot"><div class="v s1 idle">◆◆◆</div><div class="m">ждёт запуска</div></div>';
+}
+function cellVal(k){
+  var c=state.cur;
+  if(c.concept===undefined)return undefined;
+  if(k==='concept')return c.concept;
+  if(k==='style')return c.style;
+  if(k==='pal')return {pal:c.pal,temp:c.temp};
+  return c.keys;
+}
+function randVal(k){
+  var obj=state.obj||OBJ.res[2];
+  var st=pickStyle(obj,null),pl=pickPal(st);
+  if(k==='concept')return pick(PAL[pl].names);
+  if(k==='style')return st;
+  if(k==='pal')return {pal:pl,temp:pickTemp(st,obj)};
+  return pickKeys(obj,st);
+}
+function buildBoard(){
+  grid.innerHTML=CELLS.map(function(c){
+    return '<div class="cell'+(c.wide?' wide':'')+'" data-k="'+c.k+'" tabindex="0" role="button" aria-pressed="false" aria-label="'+c.label+', нажмите чтобы зафиксировать">'
+      +'<i class="mk a"></i><i class="mk b"></i><i class="mk c"></i><i class="mk d"></i>'
+      +'<div class="head"><span class="ix">'+c.ix+'</span><span>'+c.label+'</span><span class="lk">зафиксировано</span></div>'
+      +'<div class="window"><div class="veil"></div><div class="pay"></div><div class="sheen"></div><div class="reel"></div></div></div>';
+  }).join('');
+  paintAll();
+}
+function cellEl(k){return grid.querySelector('.cell[data-k="'+k+'"]')}
+function reelEl(k){var c=cellEl(k);return c?c.querySelector('.reel'):null}
+function paintAll(){
+  CELLS.forEach(function(c){
+    var r=reelEl(c.k);if(!r)return;
+    var v=cellVal(c.k);
+    r.style.transition='none';
+    r.style.transform='translate3d(0,0,0)';
+    r.innerHTML=v!==undefined?slotHTML(c.k,v):idleHTML(c.k);
+  });
+}
+function spinReel(k,finalVal,delay,dur,done){
+  var cell=cellEl(k),r=reelEl(k);
+  if(!cell||!r){done();return}
+  var win=cell.querySelector('.window');
+  function land(){
+    cell.classList.remove('spinning');
+    cell.classList.add('stopped');
+    setTimeout(function(){cell.classList.remove('stopped')},760);
+    r.style.transition='none';
+    r.style.willChange='auto';
+    r.style.transform='translate3d(0,0,0)';
+    r.innerHTML=slotHTML(k,finalVal);
+    done();
+  }
+  if(reduce){r.innerHTML=slotHTML(k,finalVal);thunk(delay/1000);land();return}
+  var h=win.getBoundingClientRect().height||win.clientHeight;
+  var seq=[],i;
+  for(i=0;i<12;i++)seq.push(randVal(k));
+  seq.push(finalVal);
+  seq.push(randVal(k));
+  var stop=seq.length-2;
+  r.innerHTML=seq.map(function(v){return slotHTML(k,v)}).join('');
+  r.style.transition='none';
+  r.style.transform='translate3d(0,0,0)';
+  void r.offsetHeight;
+  cell.classList.add('spinning');
+  ticksFor(stop+1,delay,dur);
+  thunk((delay+dur)/1000);
+  var guard=null;
+  function finish(e){
+    if(e&&e.propertyName&&e.propertyName!=='transform')return;
+    r.removeEventListener('transitionend',finish);
+    clearTimeout(guard);
+    requestAnimationFrame(land);
+  }
+  r.addEventListener('transitionend',finish);
+  guard=setTimeout(finish,delay+dur+320);
+  setTimeout(function(){
+    r.style.transition='transform '+dur+'ms cubic-bezier(.1,.55,.3,1.07)';
+    r.style.transform='translate3d(0,-'+(stop*h).toFixed(2)+'px,0)';
+  },delay);
+}
+function spinLabel(t){spinBtn.innerHTML='<span class="d">◆</span>&nbsp;&nbsp;'+t+'&nbsp;&nbsp;<span class="d">◆</span>'}
+
+function spin(){
+  if(busy)return;
+  if(!state.obj){
+    toast('сначала выберите объект');
+    var pk=document.querySelector('.pick');
+    if(pk&&pk.scrollIntoView)pk.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  busy=true;spinBtn.disabled=true;spinLabel('собираем');
+  var idea=makeIdea();
+  var keys=CELLS.map(function(c){return c.k});
+  var active=keys.filter(function(k){return !state.locks[k]});
+  if(!active.length){
+    busy=false;spinBtn.disabled=false;spinLabel('крутить ещё');
+    toast('все элементы зафиксированы — снимите фиксацию');return;
+  }
+  state.cur=idea;state.n++;sessionSpins++;
+  countEl.textContent='идей: '+state.n;
+  hideCard();
+  var left=active.length;
+  active.forEach(function(k,i){
+    spinReel(k,cellVal(k),i*150,1450+i*240,function(){
+      left--;
+      if(left===0){
+        busy=false;spinBtn.disabled=false;spinLabel('крутить ещё');
+        chime();
+        var rec=recFromState();dbAdd(rec);showCard(rec);renderArchive();
+        maybeCTA();
+      }
+    });
+  });
+}
+
+/* ============ выбор объекта ============ */
+function paintTypes(){
+  var list=OBJ[state.grp];
+  document.getElementById('types').innerHTML=list.map(function(o){
+    return '<button type="button" class="chip" data-obj="'+o.id+'" aria-pressed="'+(state.obj&&state.obj.id===o.id?'true':'false')+'">'+esc(o.l)+'</button>';
+  }).join('');
+  document.getElementById('areas').innerHTML=(AREAS[state.grp]||AREAS.res).map(function(a){
+    return '<button type="button" class="chip" data-area="'+a.id+'" aria-pressed="'+(state.area===a.id?'true':'false')+'">'+esc(a.l)+'</button>';
+  }).join('');
+}
+function resetBoard(){
+  state.cur={};state.locks={};
+  Array.prototype.forEach.call(grid.querySelectorAll('.cell'),function(c){
+    c.classList.remove('locked');c.setAttribute('aria-pressed','false');
+  });
+  paintAll();hideCard();
+}
+document.getElementById('grp').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b||busy)return;
+  state.grp=b.getAttribute('data-grp');
+  Array.prototype.forEach.call(this.querySelectorAll('button'),function(x){
+    x.setAttribute('aria-pressed',x===b?'true':'false')});
+  state.obj=null;state.area='';paintTypes();lockUI();resetBoard();
+});
+document.getElementById('types').addEventListener('click',function(e){
+  var b=e.target.closest('.chip');if(!b||busy)return;
+  var id=b.getAttribute('data-obj'),prev=state.obj&&state.obj.id;
+  state.obj=objById(id);
+  Array.prototype.forEach.call(this.querySelectorAll('.chip'),function(x){
+    x.setAttribute('aria-pressed',x===b?'true':'false')});
+  lockUI();
+  if(prev&&prev!==id&&state.cur.concept){resetBoard();toast('объект изменён — запустите рулетку заново')}
+});
+document.getElementById('areas').addEventListener('click',function(e){
+  var b=e.target.closest('.chip');if(!b)return;
+  state.area=b.getAttribute('data-area');
+  Array.prototype.forEach.call(this.querySelectorAll('.chip'),function(x){
+    x.setAttribute('aria-pressed',x===b?'true':'false')});
+});
+function lockUI(){
+  var ok=!!state.obj;
+  spinBtn.disabled=!ok;
+  hintEl.textContent=ok
+    ?(state.cur.concept?'нажмите на блок, чтобы зафиксировать · пробел — крутить':'нажмите «получить идею» · пробел — крутить')
+    :'Выберите объект выше';
+}
+wildBtn.addEventListener('click',function(){
+  state.wild=!state.wild;
+  wildBtn.setAttribute('aria-pressed',state.wild?'true':'false');
+  toast(state.wild?'смелые сочетания включены':'обычный режим');
+});
+
+/* ============ фиксация ============ */
+grid.addEventListener('click',function(e){
+  var cell=e.target.closest('.cell');if(!cell)return;
+  toggleLock(cell);
+});
+grid.addEventListener('keydown',function(e){
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  var cell=e.target.closest('.cell');if(!cell)return;
+  e.preventDefault();e.stopPropagation();
+  toggleLock(cell);
+});
+function toggleLock(cell){
+  if(busy)return;
+  var k=cell.getAttribute('data-k');
+  if(state.cur.concept===undefined){toast('сначала получите идею');return}
+  state.locks[k]=!state.locks[k];
+  cell.classList.toggle('locked',!!state.locks[k]);
+  cell.setAttribute('aria-pressed',state.locks[k]?'true':'false');
+  toast(state.locks[k]?'зафиксировано — при следующем запуске не изменится':'фиксация снята');
+}
+document.addEventListener('keydown',function(e){
+  if(e.code==='Space'&&!/^(BUTTON|INPUT|TEXTAREA|SELECT|A)$/.test(e.target.tagName)){e.preventDefault();spin()}
+});
+spinBtn.addEventListener('click',spin);
+
+/* ============ карточка ============ */
+var cardEl=document.getElementById('card'),rowsEl=document.getElementById('crows'),cnumEl=document.getElementById('cnum');
+var favBtn=document.getElementById('fav'),curRec=null;
+
+function areaLabel(grp,id){
+  if(!id)return '';
+  var list=AREAS[grp]||AREAS.res,i;
+  for(i=0;i<list.length;i++)if(list[i].id===id)return list[i].l;
+  return '';
+}
+function objLabel(rec){
+  var o=objById(rec.objId),a=areaLabel(rec.grp,rec.area);
+  return (o?o.l:'помещение')+(a?' · '+a:'');
+}
+function cardRows(r){
+  var p=PAL[r.pal],s=STYLE[r.style];
+  return [
+    ['Тип объекта',objLabel(r),'',0],
+    ['Концепция',r.concept,'',1],
+    ['Стиль',s.name,s.desc,0],
+    ['Палитра','',p.c.map(function(c){return c[0]}).join(' / ')+' · '+p.char.toLowerCase(),2],
+    ['Освещение',r.temp+' K',TEMP[r.temp],0],
+    ['Ключевые решения','','',3]
+  ];
+}
+function hideCard(){cardEl.classList.remove('on')}
+function showCard(r){
+  if(!r)return;
+  curRec=r;
+  var p=PAL[r.pal];
+  rowsEl.innerHTML=cardRows(r).map(function(row,i){
+    var val;
+    if(row[3]===2)val='<span class="sw">'+p.c.map(function(c){return '<i style="background:'+esc(c[1])+'"></i>'}).join('')+'</span>';
+    else if(row[3]===3)val='<ul class="keys">'+r.keys.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>';
+    else val='<span class="cval'+(row[3]===1?' big':'')+'">'+esc(row[1])+'</span>';
+    return '<div class="crow" style="animation-delay:'+(0.06+i*0.08).toFixed(2)+'s">'
+      +'<span class="clbl">'+esc(row[0])+'</span>'
+      +'<span>'+val+(row[2]?'<span class="cmeta">'+esc(row[2])+'</span>':'')+'</span></div>';
+  }).join('');
+  cnumEl.textContent='ваша идея №'+r.n;
+  paintFav();lockUI();
+  requestAnimationFrame(function(){requestAnimationFrame(function(){cardEl.classList.add('on')})});
+}
+function ideaText(r){
+  if(!r)return '';
+  var p=PAL[r.pal],s=STYLE[r.style];
+  return ['Идея интерьера №'+r.n,
+    'Объект: '+objLabel(r),
+    'Концепция: '+r.concept,
+    'Стиль: '+s.name+' — '+s.desc,
+    'Палитра: '+p.c.map(function(c){return c[0]+' '+c[1]}).join(', ')+' ('+p.char.toLowerCase()+')',
+    'Освещение: '+r.temp+' K — '+TEMP[r.temp],
+    'Ключевые решения: '+r.keys.join('; ')].join('\n');
+}
+document.getElementById('copy').addEventListener('click',function(){
+  var t=ideaText(curRec);
+  if(!t){toast('сначала получите идею');return}
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){toast('идея скопирована')},fb);
+  }else fb();
+  function fb(){
+    var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');toast('идея скопирована')}catch(err){toast('не вышло скопировать')}
+    document.body.removeChild(ta);
+  }
+});
+
+/* ============ PNG ============ */
+function tracked(g,t,x,y,sp){var i;for(i=0;i<t.length;i++){g.fillText(t[i],x,y);x+=g.measureText(t[i]).width+sp}}
+function trackedW(g,t,sp){var w=0,i;for(i=0;i<t.length;i++)w+=g.measureText(t[i]).width+sp;return w-sp}
+function wrapText(g,t,maxW){
+  var words=String(t).split(' '),lines=[],cur='';
+  words.forEach(function(w){
+    var tst=cur?cur+' '+w:w;
+    if(g.measureText(tst).width>maxW&&cur){lines.push(cur);cur=w}else cur=tst;
+  });
+  if(cur)lines.push(cur);
+  return lines;
+}
+function corner(g,x,y,dx,dy,len,w){
+  g.lineWidth=w;g.beginPath();g.moveTo(x,y+dy*len);g.lineTo(x,y);g.lineTo(x+dx*len,y);g.stroke();
+}
+function exportPNG(r){
+  r=r||curRec;
+  if(!r){toast('сначала получите идею');return}
+  var W=1080,H=1350,M=76,CW=W-M*2;
+  var BG='#070E1A',PANEL='#111B2E',BRASS='#C8A253',CREAM='#F2EEE3',DIM='#AAB4C8',SOFT='rgba(200,162,83,.26)';
+  var cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  var g=cv.getContext&&cv.getContext('2d');
+  if(!g){toast('браузер не поддерживает сохранение');return}
+  var p=PAL[r.pal],s=STYLE[r.style];
+  g.textBaseline='alphabetic';
+  g.fillStyle=BG;g.fillRect(0,0,W,H);
+  g.fillStyle=PANEL;g.fillRect(M-18,M-18,CW+36,H-(M-18)*2);
+  g.strokeStyle=SOFT;g.lineWidth=1;
+  g.strokeRect(M-18.5,M-18.5,CW+37,H-(M-18)*2+1);
+  g.strokeRect(M-9.5,M-9.5,CW+19,H-(M-9)*2+1);
+  g.strokeStyle=BRASS;
+  corner(g,M-18,M-18,1,1,26,2);corner(g,W-M+18,M-18,-1,1,26,2);
+  corner(g,M-18,H-M+18,1,-1,26,2);corner(g,W-M+18,H-M+18,-1,-1,26,2);
+
+  g.font='400 20px Forum, Georgia, serif';g.fillStyle=BRASS;
+  tracked(g,'ВАША ИДЕЯ №'+r.n,M,M+20,5);
+  var head='LENTIVA';
+  tracked(g,head,M+CW-trackedW(g,head,5),M+20,5);
+  g.fillStyle=BRASS;g.fillRect(M,M+34,CW,2);
+
+  var y=M+78;
+  function lab(t){g.font='400 19px Forum, Georgia, serif';g.fillStyle=DIM;tracked(g,t,M,y,4.4);y+=16}
+  function rule(){g.strokeStyle=SOFT;g.lineWidth=1;g.beginPath();g.moveTo(M,y+.5);g.lineTo(M+CW,y+.5);g.stroke();y+=34}
+  function big(t,sizes,maxLines){
+    var i,size=26,lines=[],mx=maxLines||1;
+    for(i=0;i<sizes.length;i++){
+      size=sizes[i];g.font='500 '+size+'px Jost, sans-serif';
+      lines=wrapText(g,t,CW);
+      if(lines.length<=mx)break;
+    }
+    g.fillStyle=CREAM;
+    lines.forEach(function(l,j){g.fillText(l.toUpperCase(),M,y+size*0.9+j*size*1.2)});
+    y+=lines.length*size*1.2+10;
+  }
+  function small(t){
+    g.font='400 23px Jost, sans-serif';g.fillStyle=DIM;
+    wrapText(g,t,CW).forEach(function(l){y+=27;g.fillText(l,M,y)});
+    y+=8;
+  }
+  lab('ТИП ОБЪЕКТА');big(objLabel(r),[32,28,24],2);y+=6;
+  rule();lab('КОНЦЕПЦИЯ');big(r.concept,[58,50,42,34]);y+=6;
+  rule();lab('СТИЛЬ');big(s.name,[36,32,28]);small(s.desc);
+  rule();lab('ПАЛИТРА');
+  var n=p.c.length,gap=12,sw=(CW-gap*(n-1))/n;
+  p.c.forEach(function(c,j){g.fillStyle=c[1];g.fillRect(M+j*(sw+gap),y+4,sw,104)});
+  y+=118;small(p.c.map(function(c){return c[0]}).join(' / ')+' · '+p.char.toLowerCase());
+  rule();lab('ОСВЕЩЕНИЕ');big(r.temp+' K',[38,34]);small(TEMP[r.temp]);
+  rule();lab('КЛЮЧЕВЫЕ РЕШЕНИЯ');
+  g.font='400 25px Jost, sans-serif';
+  r.keys.forEach(function(x){
+    var lines=wrapText(g,x,CW-30);
+    lines.forEach(function(l,j){
+      y+=30;
+      if(j===0){g.fillStyle=BRASS;g.font='400 13px Jost, sans-serif';g.fillText('◆',M,y-4);g.font='400 25px Jost, sans-serif'}
+      g.fillStyle=CREAM;g.fillText(l,M+30,y);
+    });
+    y+=6;
+  });
+
+  var d=new Date(),ds=('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear();
+  g.font='400 18px Forum, Georgia, serif';g.fillStyle=DIM;
+  tracked(g,'РУЛЕТКА ИНТЕРЬЕРА · LENTIVA',M,H-M-6,4.4);
+  tracked(g,ds,M+CW-trackedW(g,ds,4.4),H-M-6,4.4);
+
+  cardEl.classList.add('shot');
+  setTimeout(function(){cardEl.classList.remove('shot')},560);
+  tick(0,0.07,3000);
+  function save(url,rev){
+    var a=document.createElement('a');
+    a.href=url;a.download='ideya-interiera-'+r.n+'.png';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    if(rev)setTimeout(function(){try{URL.revokeObjectURL(url)}catch(e){}},4000);
+    toast('карточка сохранена');
+  }
+  if(cv.toBlob){cv.toBlob(function(b){if(!b){toast('не вышло сохранить');return}save(URL.createObjectURL(b),true)},'image/png')}
+  else save(cv.toDataURL('image/png'),false);
+}
+function withFonts(fn){
+  var f=document.fonts;
+  if(f&&f.load){Promise.all([f.load('500 56px Jost'),f.load('400 20px Forum'),f.load('400 23px Jost')]).then(fn,fn)}
+  else fn();
+}
+document.getElementById('png').addEventListener('click',function(){withFonts(function(){exportPNG(curRec)})});
+
+/* ============ CTA ============ */
+var ctaEl=document.getElementById('cta'),ctaShown=false;
+function contactHref(){return CONTACT_URL}
+function bindContact(el){
+  el.setAttribute('href',contactHref());
+  el.addEventListener('click',function(e){
+    if(CONTACT_URL.indexOf('USERNAME')>=0){e.preventDefault();toast('укажите CONTACT_URL в коде страницы')}
+  });
+}
+bindContact(document.getElementById('ctago'));
+bindContact(document.getElementById('cardcta'));
+function openCTA(){
+  ctaShown=true;
+  ctaEl.hidden=false;
+  requestAnimationFrame(function(){ctaEl.classList.add('on')});
+  setTimeout(function(){document.getElementById('ctax').focus()},60);
+}
+function closeCTA(){
+  ctaEl.classList.remove('on');
+  setTimeout(function(){ctaEl.hidden=true},260);
+}
+function maybeCTA(){if(!ctaShown&&sessionSpins>=3)openCTA()}
+document.getElementById('ctax').addEventListener('click',closeCTA);
+document.getElementById('ctano').addEventListener('click',closeCTA);
+ctaEl.addEventListener('click',function(e){if(e.target===ctaEl)closeCTA()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!ctaEl.hidden)closeCTA()});
+
+/* ============ сохранённые идеи ============ */
+var KEY='ri_store_v1',storeMode='local';
+var DB={v:1,items:[]};
+var arch={filter:'all',limit:8};
+var listEl=document.getElementById('alist'),statEl=document.getElementById('astat'),
+    modeEl=document.getElementById('amode'),moreBtn=document.getElementById('amore'),
+    fallBtn=document.getElementById('fall'),ffavBtn=document.getElementById('ffav');
+
+function storageOK(){try{localStorage.setItem('__ri','1');localStorage.removeItem('__ri');return true}catch(e){return false}}
+function dbLoad(){
+  if(!storageOK()){storeMode='session';return}
+  try{var raw=localStorage.getItem(KEY);if(raw){var d=JSON.parse(raw);if(d&&d.items)DB.items=d.items}}
+  catch(e){DB.items=[]}
+}
+function dbSave(){
+  if(storeMode!=='local')return;
+  try{localStorage.setItem(KEY,JSON.stringify(DB))}
+  catch(e){storeMode='session';paintMode();toast('память браузера кончилась — выгрузите идеи файлом')}
+}
+function trim(){
+  while(DB.items.length>200){
+    var idx=-1,i;
+    for(i=DB.items.length-1;i>=0;i--){if(!DB.items[i].fav){idx=i;break}}
+    if(idx<0)break;
+    DB.items.splice(idx,1);
+  }
+}
+function recFromState(){
+  var c=state.cur;
+  return {id:'i'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),ts:Date.now(),n:state.n,
+    objId:state.obj.id,grp:state.grp,area:state.area,
+    concept:c.concept,style:c.style,pal:c.pal,temp:c.temp,keys:c.keys.slice(),fav:false};
+}
+function dbAdd(r){DB.items.unshift(r);trim();dbSave()}
+function findRec(id){for(var i=0;i<DB.items.length;i++)if(DB.items[i].id===id)return DB.items[i];return null}
+function paintMode(){
+  if(storeMode==='local'){modeEl.className='amode';modeEl.textContent='сохраняется на этом устройстве'}
+  else{modeEl.className='amode warn';modeEl.textContent='браузер не даёт сохранять — идеи живут до перезагрузки'}
+  var note=document.getElementById('exnote');
+  note.textContent=storeMode==='local'
+    ?'Идеи хранятся только в этом браузере. Выгрузите файл, чтобы перенести их на другое устройство.'
+    :'Этот браузер не разрешает локальное хранение. Чтобы не потерять идеи, выгрузите их файлом или сохраняйте карточки в PNG.';
+}
+function paintFav(){
+  var on=curRec&&curRec.fav;
+  favBtn.textContent=on?'★ в избранном':'☆ в избранное';
+  favBtn.style.color=on?'var(--brass)':'';
+  favBtn.style.borderColor=on?'var(--brass)':'';
+}
+function stamp(ts){
+  var d=new Date(ts);
+  return ('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+}
+function rowHTML(r){
+  var p=PAL[r.pal],s=STYLE[r.style];
+  return '<div class="arow" data-id="'+esc(r.id)+'">'
+    +'<span class="asw">'+p.c.map(function(c){return '<i style="background:'+esc(c[1])+'"></i>'}).join('')+'</span>'
+    +'<span class="amain"><span class="aval">'+esc(r.concept)+' · '+esc(s.name)+'</span>'
+    +'<span class="ameta">'+esc(objLabel(r))+' · '+r.temp+' K · '+stamp(r.ts)+'</span></span>'
+    +'<span class="aact">'
+    +'<button type="button" class="astar'+(r.fav?' on':'')+'" data-act="fav" title="избранное">★</button>'
+    +'<button type="button" data-act="open" title="показать">открыть</button>'
+    +'<button type="button" data-act="png" title="сохранить png">png</button>'
+    +'<button type="button" data-act="del" title="удалить">✕</button>'
+    +'</span></div>';
+}
+function filtered(){return DB.items.filter(function(r){return arch.filter!=='fav'||r.fav})}
+function renderArchive(){
+  paintMode();
+  var favN=0,i;
+  for(i=0;i<DB.items.length;i++)if(DB.items[i].fav)favN++;
+  statEl.textContent='всего '+DB.items.length+' · избранное '+favN;
+  var list=filtered();
+  if(!list.length){
+    listEl.innerHTML='<div class="aempty">'+(DB.items.length?'в избранном пока пусто':'здесь появятся все идеи, которые вы получите')+'</div>';
+    moreBtn.style.display='none';return;
+  }
+  listEl.innerHTML=list.slice(0,arch.limit).map(rowHTML).join('');
+  moreBtn.style.display=list.length>arch.limit?'':'none';
+}
+listEl.addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  var row=e.target.closest('.arow');if(!row)return;
+  var r=findRec(row.getAttribute('data-id'));if(!r)return;
+  var act=b.getAttribute('data-act');
+  if(act==='fav'){r.fav=!r.fav;dbSave();if(curRec&&curRec.id===r.id)paintFav();renderArchive()}
+  else if(act==='del'){DB.items.splice(DB.items.indexOf(r),1);dbSave();renderArchive();toast('идея удалена')}
+  else if(act==='png'){withFonts(function(){exportPNG(r)})}
+  else if(act==='open'){
+    showCard(r);
+    if(cardEl.scrollIntoView)cardEl.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+});
+favBtn.addEventListener('click',function(){
+  if(!curRec){toast('сначала получите идею');return}
+  curRec.fav=!curRec.fav;dbSave();paintFav();renderArchive();
+  toast(curRec.fav?'добавлено в избранное':'убрано из избранного');
+});
+fallBtn.addEventListener('click',function(){
+  arch.filter='all';arch.limit=8;fallBtn.setAttribute('aria-pressed','true');ffavBtn.setAttribute('aria-pressed','false');renderArchive();
+});
+ffavBtn.addEventListener('click',function(){
+  arch.filter='fav';arch.limit=8;ffavBtn.setAttribute('aria-pressed','true');fallBtn.setAttribute('aria-pressed','false');renderArchive();
+});
+moreBtn.addEventListener('click',function(){arch.limit+=8;renderArchive()});
+document.getElementById('aexport').addEventListener('click',function(){
+  if(!DB.items.length){toast('идей пока нет');return}
+  var d=new Date(),ds=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+  var txt=JSON.stringify(DB,null,2),url,a=document.createElement('a');
+  try{url=URL.createObjectURL(new Blob([txt],{type:'application/json'}))}
+  catch(e){url='data:application/json;charset=utf-8,'+encodeURIComponent(txt)}
+  a.href=url;a.download='moi-idei-'+ds+'.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){try{URL.revokeObjectURL(url)}catch(e){}},4000);
+  toast('файл сохранён');
+});
+document.getElementById('aimportbtn').addEventListener('click',function(){document.getElementById('aimport').click()});
+document.getElementById('aimport').addEventListener('change',function(){
+  var f=this.files&&this.files[0],self=this;if(!f)return;
+  var fr=new FileReader();
+  fr.onload=function(){
+    try{
+      var d=JSON.parse(fr.result);
+      if(!d||!d.items||!d.items.length)throw 0;
+      var have={},added=0;
+      DB.items.forEach(function(r){have[r.id]=1});
+      d.items.forEach(function(r){
+        if(r&&r.id&&!have[r.id]&&r.concept&&PAL[r.pal]&&STYLE[r.style]){DB.items.push(r);added++}
+      });
+      DB.items.sort(function(a,b){return (b.ts||0)-(a.ts||0)});
+      trim();dbSave();renderArchive();
+      toast(added?'добавлено идей: '+added:'новых идей в файле нет');
+    }catch(e){toast('файл не читается')}
+    self.value='';
+  };
+  fr.readAsText(f);
+});
+document.getElementById('aclear').addEventListener('click',function(){
+  if(!DB.items.length){toast('идей пока нет');return}
+  if(!window.confirm('Удалить все сохранённые идеи? Избранное тоже.'))return;
+  DB.items=[];curRec=null;dbSave();renderArchive();toast('история очищена');
+});
+
+/* ============ прочее ============ */
+function toast(msg){
+  toastEl.textContent=msg;toastEl.classList.add('on');
+  clearTimeout(toast._t);
+  toast._t=setTimeout(function(){toastEl.classList.remove('on')},2100);
+}
+var soundBtn=document.getElementById('sound');
+function paintSound(){
+  soundBtn.setAttribute('aria-pressed',muted?'false':'true');
+  soundBtn.textContent=muted?'звук выкл':'звук';
+}
+soundBtn.addEventListener('click',function(){
+  muted=!muted;
+  try{localStorage.setItem('ri_mute',muted?'1':'0')}catch(e){}
+  paintSound();
+  if(!muted){unlock();tick(0,0.05,2400)}
+});
+paintSound();
+var rt;
+window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){if(!busy)paintAll()},150)});
+
+paintTypes();buildBoard();lockUI();dbLoad();
+DB.items.forEach(function(r){if(r.n>state.n)state.n=r.n});
+if(state.n)countEl.textContent='идей: '+state.n;
+renderArchive();
+if(document.fonts&&document.fonts.ready&&document.fonts.ready.then){
+  document.fonts.ready.then(function(){if(!busy)paintAll()});
+}
+})();
+</script>
+</body>
+</html>

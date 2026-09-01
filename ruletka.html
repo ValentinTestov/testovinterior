@@ -12,6 +12,7 @@
 <meta property="og:locale" content="ru_RU">
 <meta property="og:title" content="Рулетка интерьера — LentiVa">
 <meta property="og:description" content="Выберите объект и получите интерьерное направление: стиль, цвета, освещение и ключевые решения.">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="stylesheet" href="assets/fonts.css">
 <link rel="stylesheet" href="assets/base.css">
 <style>
@@ -375,6 +376,115 @@ details.extra[open] summary::before{content:"– "}
 
 /* ============ контакт: замените на свой ============ */
 var CONTACT_URL='https://t.me/vtestov';
+
+/* ============ Telegram Mini App ============
+   Вне Telegram весь блок молчит: TG===null и страница работает как раньше.
+   TG_POSTER_API — адрес твоего бэкенда, который принимает картинку и шлёт
+   её пользователю через sendPhoto. Пока пусто — кнопки png в Telegram скрыты.
+   ============================================ */
+var TG_POSTER_API='';
+
+var _W=window.Telegram&&window.Telegram.WebApp;
+var TG=(_W&&_W.platform&&_W.platform!=='unknown')?_W:null;
+var CS=(TG&&TG.CloudStorage&&TG.CloudStorage.setItem)?TG.CloudStorage:null;
+
+function hap(t){if(TG&&TG.HapticFeedback){try{TG.HapticFeedback.impactOccurred(t||'light')}catch(e){}}}
+function pngOK(){return !TG||!!TG_POSTER_API}
+
+if(TG){
+  try{
+    TG.ready();
+    TG.expand();
+    if(TG.disableVerticalSwipes)TG.disableVerticalSwipes();
+    if(TG.setHeaderColor)TG.setHeaderColor('#0A1220');
+    if(TG.setBackgroundColor)TG.setBackgroundColor('#0A1220');
+  }catch(e){}
+  ['aexport','aimportbtn'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.style.display='none';
+  });
+  if(!TG_POSTER_API){
+    var _pb=document.getElementById('png');if(_pb)_pb.style.display='none';
+  }
+}
+
+/* --- CloudStorage: 1024 ключа, 4096 символов на ключ, поэтому режем на куски --- */
+var CS_CHUNK=3800, csCount=0, csTimer=null;
+
+function csPack(items){
+  var out=[],cur=[],len=2,i,s;
+  for(i=0;i<items.length;i++){
+    s=JSON.stringify(items[i]);
+    if(cur.length&&len+s.length+1>CS_CHUNK){out.push(cur);cur=[];len=2}
+    cur.push(items[i]);len+=s.length+1;
+  }
+  if(cur.length)out.push(cur);
+  return out;
+}
+function csDrop(from,to){
+  if(!CS||to<=from||!CS.removeItems)return;
+  var ks=[],i;for(i=from;i<to;i++)ks.push('RI_C'+i);
+  CS.removeItems(ks,function(){});
+}
+function csSave(){
+  if(!CS)return;
+  clearTimeout(csTimer);
+  csTimer=setTimeout(function(){
+    var chunks=csPack(DB.items),total=chunks.length,done=0,bad=false;
+    if(!total){
+      CS.setItem('RI_META',JSON.stringify({v:1,n:0}),function(){});
+      csDrop(0,csCount);csCount=0;return;
+    }
+    chunks.forEach(function(c,i){
+      CS.setItem('RI_C'+i,JSON.stringify(c),function(err){
+        if(err)bad=true;
+        if(++done===total){
+          if(bad){toast('облако Telegram не приняло — идеи пока только на устройстве');return}
+          CS.setItem('RI_META',JSON.stringify({v:1,n:total}),function(){
+            csDrop(total,csCount);csCount=total;
+          });
+        }
+      });
+    });
+  },700);
+}
+function csLoad(cb){
+  if(!CS){cb(false);return}
+  CS.getItem('RI_META',function(err,val){
+    if(err||!val){cb(true);return}
+    var m=null;try{m=JSON.parse(val)}catch(e){}
+    var total=(m&&m.n)|0;csCount=total;
+    if(!total){cb(true);return}
+    var ks=[],i;for(i=0;i<total;i++)ks.push('RI_C'+i);
+    CS.getItems(ks,function(e2,vals){
+      if(e2||!vals){cb(true);return}
+      var items=[],a;
+      for(i=0;i<total;i++){
+        try{a=JSON.parse(vals['RI_C'+i]||'[]');if(a&&a.length)items=items.concat(a)}catch(x){}
+      }
+      DB.items=items;cb(true);
+    });
+  });
+}
+
+/* --- постер уходит сообщением от бота, а не скачиванием --- */
+function sendPoster(r){
+  if(!r){toast('сначала получите идею');return}
+  if(!TG_POSTER_API){toast('отправка постера включится вместе с бэкендом');return}
+  toast('отправляю…');
+  withFonts(function(){
+    exportPNG(r,function(blob,cv){
+      var fd=new FormData();
+      fd.append('initData',TG.initData||'');
+      fd.append('n',String(r.n));
+      if(blob)fd.append('poster',blob,'ideya-'+r.n+'.png');
+      else fd.append('poster_b64',cv.toDataURL('image/png'));
+      fetch(TG_POSTER_API,{method:'POST',body:fd}).then(function(res){
+        if(!res.ok)throw 0;
+        toast('карточка отправлена в чат');hap('medium');
+      }).catch(function(){toast('не удалось отправить — попробуйте ещё раз')});
+    });
+  });
+}
 
 /* ============ данные ============ */
 var TEMP={
@@ -744,6 +854,7 @@ function spinReel(k,finalVal,delay,dur,done){
   if(!cell||!r){done();return}
   var win=cell.querySelector('.window');
   function land(){
+    hap('light');
     cell.classList.remove('spinning');
     cell.classList.add('stopped');
     setTimeout(function(){cell.classList.remove('stopped')},760);
@@ -883,6 +994,7 @@ function toggleLock(cell){
   if(busy)return;
   var k=cell.getAttribute('data-k');
   if(state.cur.concept===undefined){toast('сначала получите идею');return}
+  hap('rigid');
   state.locks[k]=!state.locks[k];
   cell.classList.toggle('locked',!!state.locks[k]);
   cell.setAttribute('aria-pressed',state.locks[k]?'true':'false');
@@ -976,7 +1088,7 @@ function wrapText(g,t,maxW){
 function corner(g,x,y,dx,dy,len,w){
   g.lineWidth=w;g.beginPath();g.moveTo(x,y+dy*len);g.lineTo(x,y);g.lineTo(x+dx*len,y);g.stroke();
 }
-function exportPNG(r){
+function exportPNG(r,onBlob){
   r=r||curRec;
   if(!r){toast('сначала получите идею');return}
   var W=1080,H=1350,M=76,CW=W-M*2;
@@ -1055,6 +1167,11 @@ function exportPNG(r){
     if(rev)setTimeout(function(){try{URL.revokeObjectURL(url)}catch(e){}},4000);
     toast('карточка сохранена');
   }
+  if(onBlob){
+    if(cv.toBlob){cv.toBlob(function(b){onBlob(b,cv)},'image/png')}
+    else onBlob(null,cv);
+    return;
+  }
   if(cv.toBlob){cv.toBlob(function(b){if(!b){toast('не вышло сохранить');return}save(URL.createObjectURL(b),true)},'image/png')}
   else save(cv.toDataURL('image/png'),false);
 }
@@ -1063,7 +1180,10 @@ function withFonts(fn){
   if(f&&f.load){Promise.all([f.load('500 56px Jost'),f.load('400 20px Forum'),f.load('400 23px Jost')]).then(fn,fn)}
   else fn();
 }
-document.getElementById('png').addEventListener('click',function(){withFonts(function(){exportPNG(curRec)})});
+document.getElementById('png').addEventListener('click',function(){
+  if(TG){sendPoster(curRec);return}
+  withFonts(function(){exportPNG(curRec)});
+});
 
 /* ============ CTA ============ */
 var ctaEl=document.getElementById('cta'),ctaShown=false;
@@ -1071,7 +1191,8 @@ function contactHref(){return CONTACT_URL}
 function bindContact(el){
   el.setAttribute('href',contactHref());
   el.addEventListener('click',function(e){
-    if(CONTACT_URL.indexOf('USERNAME')>=0){e.preventDefault();toast('укажите CONTACT_URL в коде страницы')}
+    if(CONTACT_URL.indexOf('USERNAME')>=0){e.preventDefault();toast('укажите CONTACT_URL в коде страницы');return}
+    if(TG&&TG.openTelegramLink){e.preventDefault();TG.openTelegramLink(CONTACT_URL)}
   });
 }
 bindContact(document.getElementById('ctago'));
@@ -1101,12 +1222,17 @@ var listEl=document.getElementById('alist'),statEl=document.getElementById('asta
     fallBtn=document.getElementById('fall'),ffavBtn=document.getElementById('ffav');
 
 function storageOK(){try{localStorage.setItem('__ri','1');localStorage.removeItem('__ri');return true}catch(e){return false}}
-function dbLoad(){
+function dbLoadLocal(){
   if(!storageOK()){storeMode='session';return}
   try{var raw=localStorage.getItem(KEY);if(raw){var d=JSON.parse(raw);if(d&&d.items)DB.items=d.items}}
   catch(e){DB.items=[]}
 }
+function dbLoad(cb){
+  if(CS){storeMode='cloud';csLoad(function(){if(cb)cb()});return}
+  dbLoadLocal();if(cb)cb();
+}
 function dbSave(){
+  if(CS){csSave();return}
   if(storeMode!=='local')return;
   try{localStorage.setItem(KEY,JSON.stringify(DB))}
   catch(e){storeMode='session';paintMode();toast('память браузера кончилась — выгрузите идеи файлом')}
@@ -1128,9 +1254,14 @@ function recFromState(){
 function dbAdd(r){DB.items.unshift(r);trim();dbSave()}
 function findRec(id){for(var i=0;i<DB.items.length;i++)if(DB.items[i].id===id)return DB.items[i];return null}
 function paintMode(){
+  var note=document.getElementById('exnote');
+  if(storeMode==='cloud'){
+    modeEl.className='amode';modeEl.textContent='сохраняется в вашем Telegram';
+    note.textContent='Идеи лежат в облаке Telegram и привязаны к вашему аккаунту — переедут на любое устройство.';
+    return;
+  }
   if(storeMode==='local'){modeEl.className='amode';modeEl.textContent='сохраняется на этом устройстве'}
   else{modeEl.className='amode warn';modeEl.textContent='браузер не даёт сохранять — идеи живут до перезагрузки'}
-  var note=document.getElementById('exnote');
   note.textContent=storeMode==='local'
     ?'Идеи хранятся только в этом браузере. Выгрузите файл, чтобы перенести их на другое устройство.'
     :'Этот браузер не разрешает локальное хранение. Чтобы не потерять идеи, выгрузите их файлом или сохраняйте карточки в PNG.';
@@ -1154,7 +1285,7 @@ function rowHTML(r){
     +'<span class="aact">'
     +'<button type="button" class="astar'+(r.fav?' on':'')+'" data-act="fav" title="избранное">★</button>'
     +'<button type="button" data-act="open" title="показать">открыть</button>'
-    +'<button type="button" data-act="png" title="сохранить png">png</button>'
+    +(pngOK()?'<button type="button" data-act="png" title="сохранить png">png</button>':'')
     +'<button type="button" data-act="del" title="удалить">✕</button>'
     +'</span></div>';
 }
@@ -1179,7 +1310,7 @@ listEl.addEventListener('click',function(e){
   var act=b.getAttribute('data-act');
   if(act==='fav'){r.fav=!r.fav;dbSave();if(curRec&&curRec.id===r.id)paintFav();renderArchive()}
   else if(act==='del'){DB.items.splice(DB.items.indexOf(r),1);dbSave();renderArchive();toast('идея удалена')}
-  else if(act==='png'){withFonts(function(){exportPNG(r)})}
+  else if(act==='png'){if(TG){sendPoster(r);return}withFonts(function(){exportPNG(r)})}
   else if(act==='open'){
     showCard(r);
     if(cardEl.scrollIntoView)cardEl.scrollIntoView({behavior:'smooth',block:'center'});
@@ -1256,10 +1387,12 @@ paintSound();
 var rt;
 window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){if(!busy)paintAll()},150)});
 
-paintTypes();buildBoard();lockUI();dbLoad();
-DB.items.forEach(function(r){if(r.n>state.n)state.n=r.n});
-if(state.n)countEl.textContent='идей: '+state.n;
-renderArchive();
+paintTypes();buildBoard();lockUI();
+dbLoad(function(){
+  DB.items.forEach(function(r){if(r.n>state.n)state.n=r.n});
+  if(state.n)countEl.textContent='идей: '+state.n;
+  renderArchive();
+});
 if(document.fonts&&document.fonts.ready&&document.fonts.ready.then){
   document.fonts.ready.then(function(){if(!busy)paintAll()});
 }

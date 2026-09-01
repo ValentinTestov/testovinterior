@@ -336,8 +336,6 @@ details.extra[open] summary::before{content:"– "}
       <summary>Дополнительно</summary>
       <div class="extrabox">
         <button type="button" class="ghost" id="aexport">выгрузить файлом</button>
-        <button type="button" class="ghost" id="aimportbtn">загрузить файл</button>
-        <input type="file" id="aimport" accept=".json,application/json" hidden>
         <button type="button" class="ghost" id="aclear">очистить историю</button>
         <p class="exnote" id="exnote"></p>
       </div>
@@ -399,7 +397,7 @@ if(TG){
     if(TG.setHeaderColor)TG.setHeaderColor('#0A1220');
     if(TG.setBackgroundColor)TG.setBackgroundColor('#0A1220');
   }catch(e){}
-  ['aexport','aimportbtn'].forEach(function(id){
+  ['aexport'].forEach(function(id){
     var el=document.getElementById(id);if(el)el.style.display='none';
   });
   if(!TG_POSTER_API){
@@ -1338,27 +1336,6 @@ document.getElementById('aexport').addEventListener('click',function(){
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   setTimeout(function(){try{URL.revokeObjectURL(url)}catch(e){}},4000);
   toast('файл сохранён');
-});
-document.getElementById('aimportbtn').addEventListener('click',function(){document.getElementById('aimport').click()});
-document.getElementById('aimport').addEventListener('change',function(){
-  var f=this.files&&this.files[0],self=this;if(!f)return;
-  var fr=new FileReader();
-  fr.onload=function(){
-    try{
-      var d=JSON.parse(fr.result);
-      if(!d||!d.items||!d.items.length)throw 0;
-      var have={},added=0;
-      DB.items.forEach(function(r){have[r.id]=1});
-      d.items.forEach(function(r){
-        if(r&&r.id&&!have[r.id]&&r.concept&&PAL[r.pal]&&STYLE[r.style]){DB.items.push(r);added++}
-      });
-      DB.items.sort(function(a,b){return (b.ts||0)-(a.ts||0)});
-      trim();dbSave();renderArchive();
-      toast(added?'добавлено идей: '+added:'новых идей в файле нет');
-    }catch(e){toast('файл не читается')}
-    self.value='';
-  };
-  fr.readAsText(f);
 });
 document.getElementById('aclear').addEventListener('click',function(){
   if(!DB.items.length){toast('идей пока нет');return}

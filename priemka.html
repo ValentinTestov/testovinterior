@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0A1220">
+<title>Чек-лист приёмки квартиры у застройщика — LentiVa</title>
+<meta name="description" content="Интерактивный чек-лист приёмки квартиры: дверь, окна, стены, полы, электрика, отопление и вентиляция. Отмечайте дефекты прямо на телефоне и выгружайте готовый список замечаний для акта осмотра.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230A1220'/%3E%3Cpath d='M16 7l7 9-7 9-7-9z' fill='%23C8A253'/%3E%3C/svg%3E" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:title" content="Чек-лист приёмки квартиры у застройщика — LentiVa">
+<meta property="og:description" content="70 пунктов приёмки: что смотреть, как проверять и какие отклонения считаются браком. Отмечайте дефекты на телефоне и выгружайте список для акта осмотра.">
+<!-- после публикации добавьте абсолютные адреса, иначе превью в Telegram будет пустым:
+<meta property="og:url" content="https://ваш-домен.ru/priemka.html">
+<meta property="og:image" content="https://ваш-домен.ru/preview-priemka.jpg"> -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+/* стили только этой страницы, общее — в assets/base.css */
+.setup{margin-top:26px;border:1px solid var(--soft);padding:16px}
+.plab{font-family:var(--roman);font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--brass);margin-bottom:12px}
+.plab.sub{color:var(--dim);margin-top:18px}
+.seg{display:flex;border:1px solid var(--line);width:fit-content;max-width:100%}
+.seg button{font-family:var(--roman);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  background:none;border:0;border-right:1px solid var(--soft);color:var(--dim);padding:12px 16px;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--brass);color:#0C1220}
+.opt{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:14px;color:var(--cream);cursor:pointer}
+.opt input{width:20px;height:20px;accent-color:var(--brass);cursor:pointer}
+
+.fields{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-top:18px}
+.fields label{display:block}
+.flab{font-family:var(--roman);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;display:block}
+.fields input{width:100%;background:var(--bg);border:1px solid var(--soft);color:var(--cream);
+  font-family:var(--util);font-size:14px;padding:11px 12px}
+.fields input:focus{outline:0;border-color:var(--brass)}
+
+.tools{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:7px}
+.tools li{font-size:13px;color:#D6D1C4;border:1px solid var(--soft);padding:8px 11px}
+
+.prog{margin-top:30px;border-top:1px solid var(--soft);padding-top:14px}
+.pstat{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;
+  font-family:var(--roman);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.pstat b{font-family:var(--disp);font-weight:500;font-size:15px;letter-spacing:.04em;color:var(--cream)}
+.pstat .bad b{color:var(--brass-hi)}
+.pbar{height:2px;background:var(--soft);margin-top:12px;position:relative}
+.pbar i{position:absolute;left:0;top:0;bottom:0;background:var(--brass);width:0;transition:width .3s ease}
+.filters2{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+.filters2 button{font-family:var(--roman);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  background:none;border:1px solid var(--soft);color:var(--dim);padding:10px 14px;cursor:pointer}
+.filters2 button:hover{border-color:var(--line);color:var(--cream)}
+.filters2 button[aria-pressed="true"]{border-color:var(--brass);color:var(--brass)}
+
+.sect{margin-top:34px}
+.shead{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;border-bottom:1px solid var(--soft);padding-bottom:10px}
+.six{font-family:var(--roman);font-size:12px;letter-spacing:.2em;color:var(--brass)}
+.stitle{font-family:var(--disp);font-weight:500;font-size:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--cream)}
+.scount{margin-left:auto;font-family:var(--roman);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.scount.has{color:var(--brass)}
+
+.it{display:grid;grid-template-columns:1fr auto;gap:10px 16px;align-items:start;
+  border-bottom:1px solid rgba(200,162,83,.09);padding:14px 0}
+.it[data-v="ok"]{opacity:.62}
+.it[data-v="bad"]{border-left:2px solid var(--brass);padding-left:12px;background:linear-gradient(90deg,rgba(200,162,83,.05),transparent 55%)}
+.itxt b{display:block;font-weight:400;font-size:15px;line-height:1.45;color:var(--cream)}
+.ih{display:block;font-size:13px;line-height:1.5;color:var(--dim);margin-top:5px}
+.ist{display:flex;gap:6px}
+.sb{font-family:var(--roman);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  background:none;border:1px solid var(--soft);color:var(--dim);padding:10px 13px;cursor:pointer;min-width:62px}
+.sb:hover{border-color:var(--line);color:var(--cream)}
+.sb[aria-pressed="true"]{border-color:var(--brass);color:var(--brass);background:rgba(200,162,83,.10)}
+.inote{grid-column:1/-1}
+.inote textarea{width:100%;background:var(--bg);border:1px solid var(--soft);color:var(--cream);
+  font-family:var(--util);font-size:14px;line-height:1.5;padding:10px 12px;min-height:64px;resize:vertical}
+.inote textarea:focus{outline:0;border-color:var(--brass)}
+.pbox,.pnote{display:none}
+
+.sum{margin-top:46px;border:1px solid var(--line);background:var(--panel);padding:26px 22px;position:relative}
+.sum::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--brass)}
+.sumhead{font-family:var(--roman);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--brass);margin-bottom:14px}
+.sgroup{border-top:1px solid var(--soft);padding:14px 0 4px}
+.sgroup:first-child{border-top:0;padding-top:0}
+.sgt{font-family:var(--roman);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.sgroup ol{margin:0;padding-left:20px}
+.sgroup li{font-size:14px;line-height:1.55;color:var(--cream);margin-bottom:7px}
+.sgroup li span{display:block;color:var(--dim);font-size:13px;margin-top:2px}
+.sempty{font-size:14px;color:var(--dim);line-height:1.6}
+.sacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;padding-top:18px;border-top:1px solid var(--soft)}
+.ghost{font-family:var(--roman);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  background:none;border:1px solid var(--soft);color:var(--cream);padding:12px 15px;cursor:pointer;text-decoration:none;display:inline-block}
+.ghost:hover{border-color:var(--brass);color:var(--brass)}
+.ghost.gold{border-color:var(--brass);color:var(--brass-hi)}
+.ghost.gold:hover{background:rgba(200,162,83,.12)}
+.snote{font-size:12px;color:var(--dim);line-height:1.6;margin:14px 0 0}
+
+.disc{margin-top:30px;border-top:1px solid var(--soft);padding-top:16px;font-size:12px;color:var(--dim);line-height:1.65}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);z-index:50;
+  background:var(--panel-2);border:1px solid var(--line);color:var(--cream);
+  font-family:var(--roman);font-size:12px;letter-spacing:.12em;padding:12px 20px;max-width:calc(100vw - 32px);
+  opacity:0;pointer-events:none;transition:all .25s ease;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+.list.f-todo .it[data-v]{display:none}
+.list.f-bad .it:not([data-v="bad"]){display:none}
+.sect.empty{display:none}
+.printhead{display:none}
+
+@media (max-width:640px){
+  .fields{grid-template-columns:1fr}
+  .it{grid-template-columns:1fr}
+  .ist{width:100%}
+  .sb{flex:1;padding:13px 10px}
+  .scount{margin-left:0;width:100%}
+  .sum{padding:22px 16px}
+}
+@media print{
+  .top,.foot,.bg,.setup,.filters2,.sacts,.toast,.cta,.inote textarea,.ist,.disc,.fan,.dash,.tools,.plab,#pSave{display:none!important}
+  html,body{background:#fff!important;color:#000!important}
+  .wrap{max-width:none;padding:0}
+  h1{font-size:26px;color:#000!important;text-align:left;letter-spacing:.06em}
+  h2,.stitle,.itxt b{color:#000}
+  .eyebrow,.lede,.ih,.sgroup li span,.scount{color:#333!important}
+  .lede{text-align:left;max-width:none;font-size:13px}
+  .sec{padding-top:0}
+  .printhead{display:block;font-size:13px;line-height:1.7;margin:10px 0 18px;color:#000}
+  .prog{border-color:#999}
+  .pstat,.pstat b{color:#000}
+  .pbar{display:none}
+  .sect{margin-top:18px;break-inside:auto}
+  .shead{border-color:#999;padding-bottom:6px}
+  .it{grid-template-columns:auto 1fr;gap:4px 10px;padding:7px 0;border-color:#ddd;opacity:1!important;
+    background:none!important;border-left:0!important;padding-left:0!important;break-inside:avoid}
+  .it .itxt b{font-size:13px;line-height:1.35}
+  .ih{font-size:11px;margin-top:2px}
+  .pbox{display:block;width:14px;height:14px;border:1px solid #000;text-align:center;
+    font-size:11px;line-height:13px;margin-top:2px}
+  .it[data-v="ok"] .pbox::before{content:"✓"}
+  .it[data-v="bad"] .pbox::before{content:"✕"}
+  .it[data-v="bad"] .itxt b{font-weight:700}
+  .pnote{display:block;font-size:12px;color:#000;margin-top:4px;border-bottom:1px solid #999;padding-bottom:2px}
+  .inote{grid-column:2}
+  .sum{border-color:#000;background:none;padding:14px 0 0;break-before:page}
+  .sum::before{display:none}
+  .sumhead,.sgt{color:#000}
+  .sgroup li{color:#000;font-size:13px}
+  .snote{display:none}
+}
+@media (prefers-reduced-motion:reduce){.pbar i,.toast{transition:none}}
+</style>
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=112145522', 'ym');
+
+    ym(112145522, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/112145522" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+<header class="top">
+  <div class="topin">
+    <a class="brand" href="index.html"><span>◆</span>LentiVa</a>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="nav" aria-label="Меню">☰</button>
+    <nav class="nav" id="nav">
+      <a href="index.html">Главная</a>
+      <a href="portfolio.html">Портфолио</a>
+      <a href="ruletka.html">Рулетка</a>
+      <a href="priemka.html" aria-current="page">Приёмка</a>
+      <a href="services.html">Услуги и цены</a>
+      <a class="tg" href="https://t.me/vtestov" target="_blank" rel="noopener">Написать</a>
+    </nav>
+  </div>
+</header>
+<main>
+<div class="wrap">
+
+  <div class="fan">
+    <svg viewBox="0 0 600 96" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+      <g stroke="#C8A253" stroke-width="1" fill="none" opacity=".55">
+        <g transform="rotate(-72 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(-60 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(-48 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(-36 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(-24 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(-12 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <line x1="300" y1="96" x2="300" y2="2"/>
+        <g transform="rotate(12 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(24 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(36 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(48 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(60 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+        <g transform="rotate(72 300 96)"><line x1="300" y1="96" x2="300" y2="2"/></g>
+      </g>
+      <g stroke="#C8A253" fill="none" opacity=".5">
+        <path d="M180 96 A120 120 0 0 1 420 96"/>
+        <path d="M212 96 A88 88 0 0 1 388 96"/>
+      </g>
+    </svg>
+  </div>
+
+  <p class="eyebrow">lentiva · инструмент</p>
+  <h1>Чек-лист<br>приёмки</h1>
+  <div class="dash"><i></i><span>◆</span><i></i></div>
+
+  <p class="lede">Приёмка квартиры у застройщика по пунктам: что смотреть, чем проверять и какое отклонение уже считается дефектом. Отмечайте прямо на телефоне во время осмотра — в конце получите готовый список замечаний для акта.</p>
+
+  <div class="printhead" id="printhead"></div>
+
+  <section class="setup">
+    <div class="plab">Что принимаете</div>
+    <div class="seg" id="fin" role="group" aria-label="Тип отделки">
+      <button type="button" data-fin="bez" aria-pressed="false">Без отделки</button>
+      <button type="button" data-fin="pred" aria-pressed="true">Предчистовая</button>
+      <button type="button" data-fin="chist" aria-pressed="false">С отделкой</button>
+    </div>
+    <label class="opt"><input type="checkbox" id="balc" checked> Есть балкон или лоджия</label>
+
+    <div class="plab sub">Для акта — заполняется по желанию</div>
+    <div class="fields">
+      <label><span class="flab">Объект, адрес</span><input type="text" id="mObj" placeholder="ЖК, корпус"></label>
+      <label><span class="flab">Квартира</span><input type="text" id="mFlat" placeholder="№"></label>
+      <label><span class="flab">Дата осмотра</span><input type="date" id="mDate"></label>
+    </div>
+
+    <div class="plab sub">Возьмите с собой</div>
+    <ul class="tools">
+      <li>рулетка 5 м</li><li>лазерный дальномер</li><li>правило 2 м или уровень</li>
+      <li>фонарик</li><li>зарядка или тестер розеток</li><li>лампочка E27</li>
+      <li>лист А4</li><li>мел или малярный скотч</li><li>стремянка</li><li>телефон с зарядом на фото</li>
+    </ul>
+  </section>
+
+  <div class="prog">
+    <div class="pstat">
+      <span>проверено <b id="pDone">0</b> из <b id="pAll">0</b></span>
+      <span class="bad">замечаний <b id="pBad">0</b></span>
+      <span id="pSave">сохраняется на этом устройстве</span>
+    </div>
+    <div class="pbar"><i id="pFill"></i></div>
+    <div class="filters2" role="group" aria-label="Фильтр пунктов">
+      <button type="button" data-f="all" aria-pressed="true">все пункты</button>
+      <button type="button" data-f="todo" aria-pressed="false">не проверено</button>
+      <button type="button" data-f="bad" aria-pressed="false">только замечания</button>
+    </div>
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <section class="sum" id="sum">
+    <div class="sumhead">список замечаний</div>
+    <div id="sumList"></div>
+    <div class="sacts">
+      <button type="button" class="ghost" id="btnCopy">скопировать список</button>
+      <button type="button" class="ghost" id="btnPrint">распечатать или в pdf</button>
+      <button type="button" class="ghost" id="btnClear">очистить</button>
+      <a class="ghost gold" id="btnTg" href="https://t.me/vtestov" target="_blank" rel="noopener">показать дизайнеру</a>
+    </div>
+    <p class="snote">Отметки хранятся только в вашем браузере — можно закрыть страницу и вернуться к осмотру позже. Мы их не видим и никуда не передаём.</p>
+  </section>
+
+  <div class="cta">
+    <h2 style="margin-bottom:10px">Получили ключи?</h2>
+    <p>Самое время планировать интерьер — пока не куплены материалы и мебель. Пришлите планировку и список замечаний: скажу, что из этого повлияет на ремонт и с чего начинать проект.</p>
+    <div class="btns">
+      <a class="btn solid" href="https://t.me/vtestov" target="_blank" rel="noopener">Написать в Telegram</a>
+      <a class="btn quiet" href="services.html">Услуги и цены</a>
+    </div>
+  </div>
+
+  <p class="disc">Чек-лист носит справочный характер и не заменяет осмотр со специалистом. Числовые допуски приведены как ориентир по действующим сводам правил и ГОСТ — конкретные требования смотрите в договоре и проектной документации. Порядок приёмки и сроки устранения недостатков периодически меняются, уточняйте актуальные правила на дату осмотра.</p>
+</div>
+</main>
+<footer class="foot">
+  <div class="footin">
+    <div class="fb">LentiVa</div>
+    <nav><a href="index.html">Главная</a><a href="portfolio.html">Портфолио</a><a href="ruletka.html">Рулетка</a><a href="priemka.html">Приёмка</a><a href="services.html">Услуги и цены</a></nav>
+    <div class="fcontact">
+      <span>Связаться: <a href="https://t.me/vtestov" target="_blank" rel="noopener">t.me/vtestov</a></span>
+      <span class="cp">© 2026 LentiVa · дизайн интерьера</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/site.js"></script>
+<script>
+(function(){
+"use strict";
+
+var METRIKA_ID=112145522;
+
+/* ============ Telegram Mini App ============
+   Вне Telegram блок молчит и страница работает как обычная веб-страница. */
+var _W=window.Telegram&&window.Telegram.WebApp;
+var TG=(_W&&_W.platform&&_W.platform!=='unknown')?_W:null;
+if(TG){
+  try{
+    TG.ready();TG.expand();
+    if(TG.setHeaderColor)TG.setHeaderColor('#0A1220');
+    if(TG.setBackgroundColor)TG.setBackgroundColor('#0A1220');
+  }catch(e){}
+}
+function hap(t){if(TG&&TG.HapticFeedback){try{TG.HapticFeedback.impactOccurred(t||'light')}catch(e){}}}
+
+/* цели Метрики: priemka_start, priemka_copy, priemka_print, priemka_contact */
+var goalsSent={};
+function goal(name){
+  if(goalsSent[name])return;
+  goalsSent[name]=true;
+  if(window.ym){try{ym(METRIKA_ID,'reachGoal',name)}catch(e){}}
+}
+
+/* ============ данные ============
+   f — для какой отделки пункт актуален: bez — без отделки, pred — предчистовая, chist — с отделкой.
+   Без f пункт показывается всегда. */
+var SECTIONS=[
+{id:'doc',ix:'I',t:'Документы и подготовка',items:[
+ {id:'doc1',t:'Паспорт, договор и доверенность на руках',h:'Если на приёмку едет представитель, доверенность обязательна — без неё осмотр не состоится.'},
+ {id:'doc2',t:'Смотровой лист получен в двух экземплярах',h:'Один экземпляр с подписью представителя застройщика и датой остаётся у вас.'},
+ {id:'doc3',t:'Номер квартиры, этаж и подъезд совпадают с договором'},
+ {id:'doc4',t:'Фактическая площадь сверена с договором',h:'Промерьте все помещения. Расхождение с проектной площадью — основание для перерасчёта.'},
+ {id:'doc5',t:'Осмотр идёт при дневном свете',h:'От дизайнера: при искусственном свете не видно ни разнотона покраски, ни волн на стенах. Назначайте приёмку на день.'},
+ {id:'doc6',t:'Паспорта и гарантии на окна, дверь, счётчики и оборудование переданы'}
+]},
+{id:'door',ix:'II',t:'Входная дверь',items:[
+ {id:'dr1',t:'Дверь открывается и закрывается без усилия, не задевает пол и коробку'},
+ {id:'dr2',t:'Замки работают всеми ключами, ручка не люфтит'},
+ {id:'dr3',t:'Полотно и коробка без вмятин, царапин и сколов покрытия'},
+ {id:'dr4',t:'Притвор плотный по всему периметру',h:'Зажмите дверью лист бумаги: он должен вытаскиваться с заметным усилием в любой точке периметра.'},
+ {id:'dr5',t:'Зазоры между полотном и коробкой одинаковые'},
+ {id:'dr6',t:'Дверь стоит вертикально и не открывается сама',h:'Приоткрытая створка, которая уезжает сама, — признак перекоса коробки.'},
+ {id:'dr7',t:'Монтажный шов запенен и закрыт, наличники установлены'},
+ {id:'dr8',t:'Глазок, петли и фурнитура на месте, петли не скрипят'}
+]},
+{id:'win',ix:'III',t:'Окна и остекление',items:[
+ {id:'w1',t:'Створки открываются во всех режимах, фурнитура работает без заеданий'},
+ {id:'w2',t:'Стеклопакеты без царапин, сколов и трещин',h:'Дефекты стекла оценивают при рассеянном дневном свете примерно с 2 метров: то, что видно с этой дистанции, — брак.'},
+ {id:'w3',t:'Внутри стеклопакета нет запотевания и пыли',h:'Конденсат между стёклами означает разгерметизацию — меняют за счёт застройщика.'},
+ {id:'w4',t:'Створки прижимаются плотно, уплотнители целые',h:'Тот же тест листом бумаги по периметру каждой створки.'},
+ {id:'w5',t:'Нет продувания по раме и примыканиям',h:'Проведите вдоль стыков ладонью или пламенем зажигалки — в холодную погоду сквозняк заметен сразу.'},
+ {id:'w6',t:'Рама установлена вертикально',h:'Ориентир по ГОСТ — отклонение не более 1,5 мм на 1 метр высоты. Проверяется уровнем.'},
+ {id:'w7',t:'Монтажные швы запенены, откосы без трещин'},
+ {id:'w8',t:'Отлив закреплён, с уклоном наружу, без вмятин'},
+ {id:'w9',t:'Подоконник закреплён, не прогибается, без царапин'},
+ {id:'w10',t:'Ручки, заглушки и дренажные отверстия на месте',h:'Дренаж в нижней части рамы должен быть открыт, иначе вода пойдёт внутрь.'}
+]},
+{id:'balc',ix:'IV',t:'Балкон и лоджия',opt:'balc',items:[
+ {id:'b1',t:'Остекление открывается и закрывается без перекосов'},
+ {id:'b2',t:'Нет трещин в стёклах и щелей в примыканиях к стенам'},
+ {id:'b3',t:'Пол без трещин и провалов'},
+ {id:'b4',t:'Козырёк и отливы без вмятин, следов протечек нет'},
+ {id:'b5',t:'Ограждение закреплено жёстко, не шатается'},
+ {id:'b6',t:'На стенах и потолке нет следов влаги и промерзания'}
+]},
+{id:'wall',ix:'V',t:'Стены и перегородки',items:[
+ {id:'s1',t:'Стены без трещин, отслоений и следов протечек'},
+ {id:'s2',t:'Перегородки и проёмы на местах по плану',h:'От дизайнера: сверьте ширину проёмов с планировкой — от этого зависит, какая мебель вообще пройдёт в комнату.'},
+ {id:'s3',t:'Стены вертикальны',h:'Правило 2 м с уровнем. Для улучшенной штукатурки ориентир — не более 2 мм на 1 метр и не более 10 мм на всю высоту.',f:['pred','chist']},
+ {id:'s4',t:'Углы прямые там, где предусмотрено проектом',h:'Косой угол потом упрётся в кухонный гарнитур или шкаф — переделывать придётся за свой счёт.'},
+ {id:'s5',t:'Штукатурка без пустот и бухтения',h:'Простучите стены костяшками: глухой гулкий звук — отслоение.',f:['pred','chist']},
+ {id:'s6',t:'Нет плесени, сырости и высолов'},
+ {id:'s7',t:'Покраска или обои без пузырей, пятен, разнотона и расхождений на стыках',f:['chist']},
+ {id:'s8',t:'Плитка не бухтит, швы ровные, затирка без пропусков',f:['chist']}
+]},
+{id:'floor',ix:'VI',t:'Полы',items:[
+ {id:'f1',t:'Плита перекрытия без трещин, сколов и провалов',f:['bez']},
+ {id:'f2',t:'Стяжка без трещин и бухтения',h:'Простучите всю площадь, особенно у стен и в дверных проёмах.',f:['pred','chist']},
+ {id:'f3',t:'Пол горизонтален',h:'Ориентир: перепад не более 0,2% от размера помещения и не более 50 мм.'},
+ {id:'f4',t:'Просветы под двухметровым правилом в норме',h:'Ориентир: под стяжкой — не более 4 мм, под ламинат и линолеум — не более 2 мм.',f:['pred','chist']},
+ {id:'f5',t:'Стяжка доходит до стен, у примыканий нет пустот',f:['pred','chist']},
+ {id:'f6',t:'Покрытие без вздутий, царапин и щелей, плинтус прилегает',f:['chist']},
+ {id:'f7',t:'Стыки покрытий и пороги выполнены аккуратно',f:['chist']},
+ {id:'f8',t:'В санузле выполнена гидроизоляция с заходом на стены'}
+]},
+{id:'ceil',ix:'VII',t:'Потолки',items:[
+ {id:'c1',t:'Нет трещин, перепадов между плитами и следов протечек'},
+ {id:'c2',t:'Стыки плит перекрытия заделаны'},
+ {id:'c3',t:'Высота потолка соответствует договору',h:'От дизайнера: замерьте в нескольких точках. Именно высота решает, влезут ли шкафы до потолка и останется ли место на подсветку.'},
+ {id:'c4',t:'Потолок ровный по горизонту',f:['pred','chist']},
+ {id:'c5',t:'Покраска без пятен и разнотона, натяжной без провисаний и зазоров',f:['chist']}
+]},
+{id:'el',ix:'VIII',t:'Электрика',items:[
+ {id:'e1',t:'Щиток установлен, автоматы подписаны, УЗО или дифавтомат есть'},
+ {id:'e2',t:'Все автоматы включаются и держат нагрузку'},
+ {id:'e3',t:'Каждая розетка под напряжением',h:'Проверяйте тестером или зарядкой с индикатором — на глаз это не определить.'},
+ {id:'e4',t:'Выключатели работают, свет включается',h:'Возьмите свою лампочку: патроны часто оставляют пустыми.'},
+ {id:'e5',t:'Количество и расположение точек совпадает с проектом',h:'От дизайнера: сфотографируйте все выводы с рулеткой до отделки — сэкономите день на разметке и не попадёте сверлом в кабель.'},
+ {id:'e6',t:'Заземление подключено',h:'Проверяется индикаторной отвёрткой или тестером по третьему контакту розетки.'},
+ {id:'e7',t:'Оголённых проводов нет, распаячные коробки закрыты'},
+ {id:'e8',t:'Счётчик электроэнергии: номер, показания и пломба зафиксированы'},
+ {id:'e9',t:'Звонок, домофон и слаботочные выводы работают'}
+]},
+{id:'heat',ix:'IX',t:'Отопление',items:[
+ {id:'h1',t:'Радиаторы закреплены жёстко, без вмятин и сколов краски'},
+ {id:'h2',t:'Количество секций соответствует проекту'},
+ {id:'h3',t:'Краны Маевского на месте и работают'},
+ {id:'h4',t:'Терморегуляторы установлены и вращаются'},
+ {id:'h5',t:'На соединениях нет подтёков и следов ржавчины'},
+ {id:'h6',t:'Радиатор установлен с нормальными зазорами',h:'Ориентир: около 60 мм от пола, 50 мм до подоконника, 25 мм до стены — иначе он греет подоконник, а не комнату.'},
+ {id:'h7',t:'Тёплый пол работает, коллектор и терморегулятор доступны'}
+]},
+{id:'water',ix:'X',t:'Вода и канализация',items:[
+ {id:'v1',t:'Счётчики ХВС и ГВС: номера, показания и пломбы записаны',h:'Сфотографируйте табло и пломбы — это ваш аргумент при первом же споре по начислениям.'},
+ {id:'v2',t:'Запорные краны на стояках работают и не текут'},
+ {id:'v3',t:'Фильтры грубой очистки установлены'},
+ {id:'v4',t:'В сантехшкафу и на стояках нет протечек и следов влаги'},
+ {id:'v5',t:'Канализационные выпуски заглушены, ревизия доступна'},
+ {id:'v6',t:'Сантехника установлена и подключена без протечек',f:['chist']},
+ {id:'v7',t:'Полотенцесушитель закреплён, без подтёков'}
+]},
+{id:'vent',ix:'XI',t:'Вентиляция',items:[
+ {id:'n1',t:'Есть тяга в кухне и санузлах',h:'Приложите лист А4 к решётке при приоткрытом окне: он должен прилипнуть. Без притока воздуха тест ничего не покажет.'},
+ {id:'n2',t:'Вентканалы не забиты строительным мусором',h:'Посветите фонариком в канал — мешки и обрезки внутри встречаются чаще, чем кажется.'},
+ {id:'n3',t:'Вентиляционные решётки установлены'},
+ {id:'n4',t:'Нет обратной тяги и запахов от соседей'}
+]},
+{id:'fin',ix:'XII',t:'Финал осмотра',items:[
+ {id:'z1',t:'Все дефекты сфотографированы с привязкой к месту',h:'Снимайте сначала общий план комнаты, потом дефект крупно: иначе через месяц не докажете, где именно это было.'},
+ {id:'z2',t:'Каждое замечание внесено в акт конкретно: что и где'},
+ {id:'z3',t:'Второй экземпляр акта с подписью и датой у вас на руках'},
+ {id:'z4',t:'Показания всех счётчиков зафиксированы'},
+ {id:'z5',t:'Срок устранения замечаний согласован письменно'},
+ {id:'z6',t:'Акт приёма-передачи не подписан, пока замечания не урегулированы',h:'Подпись без оговорок означает, что квартиру вы приняли в текущем состоянии.'}
+]}
+];
+
+/* ============ состояние ============ */
+var KEY='pk_store_v1';
+var st={fin:'pred',balc:true,marks:{},notes:{},meta:{obj:'',flat:'',date:''},filter:'all'};
+var canStore=true;
+
+function storageOK(){try{localStorage.setItem('__pk','1');localStorage.removeItem('__pk');return true}catch(e){return false}}
+function load(){
+  canStore=storageOK();
+  if(!canStore)return;
+  try{
+    var raw=localStorage.getItem(KEY);
+    if(!raw)return;
+    var d=JSON.parse(raw);
+    if(!d)return;
+    if(d.fin)st.fin=d.fin;
+    if(typeof d.balc==='boolean')st.balc=d.balc;
+    if(d.marks)st.marks=d.marks;
+    if(d.notes)st.notes=d.notes;
+    if(d.meta)st.meta=d.meta;
+  }catch(e){}
+}
+var saveTimer=null;
+function save(){
+  if(!canStore)return;
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(function(){
+    try{localStorage.setItem(KEY,JSON.stringify({v:1,fin:st.fin,balc:st.balc,marks:st.marks,notes:st.notes,meta:st.meta}))}
+    catch(e){canStore=false;paintSaveMode();toast('браузер не даёт сохранять — скопируйте список, чтобы не потерять')}
+  },350);
+}
+
+/* ============ вспомогательное ============ */
+function esc(t){return String(t).replace(/[&<>"']/g,function(m){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
+function applies(it){return !it.f||it.f.indexOf(st.fin)>=0}
+function sectionOn(s){return !s.opt||(s.opt==='balc'&&st.balc)}
+function eachItem(fn){
+  SECTIONS.forEach(function(s){
+    if(!sectionOn(s))return;
+    s.items.forEach(function(it){if(applies(it))fn(it,s)});
+  });
+}
+
+/* ============ отрисовка ============ */
+var listEl=document.getElementById('list');
+
+function itemHTML(it){
+  var v=st.marks[it.id]||'';
+  var note=st.notes[it.id]||'';
+  return '<div class="it" data-id="'+esc(it.id)+'"'+(v?' data-v="'+esc(v)+'"':'')+'>'
+    +'<span class="pbox" aria-hidden="true"></span>'
+    +'<div class="itxt"><b>'+esc(it.t)+'</b>'+(it.h?'<span class="ih">'+esc(it.h)+'</span>':'')+'</div>'
+    +'<div class="ist">'
+      +'<button type="button" class="sb" data-v="ok" aria-pressed="'+(v==='ok')+'" aria-label="Норма: '+esc(it.t)+'">ок</button>'
+      +'<button type="button" class="sb" data-v="bad" aria-pressed="'+(v==='bad')+'" aria-label="Дефект: '+esc(it.t)+'">дефект</button>'
+    +'</div>'
+    +'<div class="inote"'+(v==='bad'?'':' hidden')+'>'
+      +'<textarea placeholder="Что именно не так и где — комната, стена, окно">'+esc(note)+'</textarea>'
+      +'<span class="pnote">'+(note?esc(note):'&nbsp;')+'</span>'
+    +'</div>'
+  +'</div>';
+}
+function render(){
+  listEl.innerHTML=SECTIONS.map(function(s){
+    if(!sectionOn(s))return '';
+    var items=s.items.filter(applies);
+    if(!items.length)return '';
+    return '<section class="sect" data-s="'+esc(s.id)+'">'
+      +'<div class="shead"><span class="six">'+esc(s.ix)+'</span><span class="stitle">'+esc(s.t)+'</span>'
+      +'<span class="scount"></span></div>'
+      +items.map(itemHTML).join('')
+    +'</section>';
+  }).join('');
+  paintCounts();
+  applyFilter();
+  renderSum();
+}
+function paintCounts(){
+  var all=0,done=0,bad=0;
+  SECTIONS.forEach(function(s){
+    if(!sectionOn(s))return;
+    var sec=listEl.querySelector('.sect[data-s="'+s.id+'"]');
+    var sa=0,sd=0,sb=0;
+    s.items.forEach(function(it){
+      if(!applies(it))return;
+      var v=st.marks[it.id];
+      sa++;if(v)sd++;if(v==='bad')sb++;
+    });
+    all+=sa;done+=sd;bad+=sb;
+    if(sec){
+      var c=sec.querySelector('.scount');
+      c.textContent=sd+' из '+sa+(sb?' · замечаний '+sb:'');
+      c.className='scount'+(sb?' has':'');
+    }
+  });
+  document.getElementById('pAll').textContent=all;
+  document.getElementById('pDone').textContent=done;
+  document.getElementById('pBad').textContent=bad;
+  document.getElementById('pFill').style.width=(all?Math.round(done/all*100):0)+'%';
+}
+function applyFilter(){
+  listEl.className='list'+(st.filter==='all'?'':' f-'+st.filter);
+  Array.prototype.forEach.call(listEl.querySelectorAll('.sect'),function(sec){
+    var vis=0;
+    Array.prototype.forEach.call(sec.querySelectorAll('.it'),function(it){
+      var v=it.getAttribute('data-v');
+      if(st.filter==='todo'&&v)return;
+      if(st.filter==='bad'&&v!=='bad')return;
+      vis++;
+    });
+    sec.classList.toggle('empty',vis===0);
+  });
+}
+
+/* ============ итоговый список ============ */
+var sumListEl=document.getElementById('sumList');
+function badGroups(){
+  var out=[];
+  SECTIONS.forEach(function(s){
+    if(!sectionOn(s))return;
+    var items=s.items.filter(function(it){return applies(it)&&st.marks[it.id]==='bad'});
+    if(items.length)out.push({s:s,items:items});
+  });
+  return out;
+}
+function renderSum(){
+  var groups=badGroups();
+  if(!groups.length){
+    sumListEl.innerHTML='<p class="sempty">Пока ничего не отмечено как дефект. Отмечайте пункты кнопкой «дефект» — они соберутся сюда списком, готовым к переносу в акт осмотра.</p>';
+    return;
+  }
+  var n=0;
+  sumListEl.innerHTML=groups.map(function(g){
+    return '<div class="sgroup"><div class="sgt">'+esc(g.s.ix)+' · '+esc(g.s.t)+'</div><ol start="'+(n+1)+'">'
+      +g.items.map(function(it){
+        n++;
+        var note=st.notes[it.id]||'';
+        return '<li>'+esc(it.t)+(note?'<span>'+esc(note)+'</span>':'')+'</li>';
+      }).join('')
+    +'</ol></div>';
+  }).join('');
+}
+function metaLines(){
+  var out=[];
+  if(st.meta.obj)out.push('Объект: '+st.meta.obj);
+  if(st.meta.flat)out.push('Квартира: '+st.meta.flat);
+  if(st.meta.date){
+    var p=st.meta.date.split('-');
+    out.push('Дата осмотра: '+(p.length===3?p[2]+'.'+p[1]+'.'+p[0]:st.meta.date));
+  }
+  return out;
+}
+function finLabel(){
+  return st.fin==='bez'?'без отделки':(st.fin==='chist'?'с отделкой от застройщика':'предчистовая отделка');
+}
+function sumText(){
+  var groups=badGroups(),all=0,done=0;
+  eachItem(function(it){all++;if(st.marks[it.id])done++});
+  var out=['СПИСОК ЗАМЕЧАНИЙ ПО ОСМОТРУ КВАРТИРЫ'];
+  var m=metaLines();
+  if(m.length)out=out.concat(m);
+  out.push('Тип отделки: '+finLabel());
+  out.push('');
+  if(!groups.length)out.push('Замечаний не зафиксировано.');
+  else{
+    var n=0;
+    groups.forEach(function(g){
+      out.push(g.s.ix+'. '+g.s.t.toUpperCase());
+      g.items.forEach(function(it){
+        n++;
+        var note=st.notes[it.id]||'';
+        out.push(n+'. '+it.t+(note?' — '+note:''));
+      });
+      out.push('');
+    });
+    out.push('Всего замечаний: '+n);
+  }
+  out.push('Проверено пунктов: '+done+' из '+all);
+  out.push('');
+  out.push('Составлено по чек-листу приёмки LentiVa · t.me/vtestov');
+  return out.join('\n');
+}
+function paintPrintHead(){
+  var m=metaLines();
+  m.push('Тип отделки: '+finLabel());
+  document.getElementById('printhead').innerHTML=m.map(esc).join('<br>');
+}
+
+/* ============ события ============ */
+listEl.addEventListener('click',function(e){
+  var b=e.target.closest('.sb');
+  if(!b)return;
+  var row=b.closest('.it'),id=row.getAttribute('data-id'),v=b.getAttribute('data-v');
+  var cur=st.marks[id]||'';
+  var next=(cur===v)?'':v;
+  if(next)st.marks[id]=next;else delete st.marks[id];
+  if(next)row.setAttribute('data-v',next);else row.removeAttribute('data-v');
+  Array.prototype.forEach.call(row.querySelectorAll('.sb'),function(x){
+    x.setAttribute('aria-pressed',String(x.getAttribute('data-v')===next));
+  });
+  row.querySelector('.inote').hidden=(next!=='bad');
+  hap(next==='bad'?'medium':'light');
+  goal('priemka_start');
+  paintCounts();applyFilter();renderSum();save();
+});
+listEl.addEventListener('input',function(e){
+  if(e.target.tagName!=='TEXTAREA')return;
+  var row=e.target.closest('.it'),id=row.getAttribute('data-id'),val=e.target.value;
+  st.notes[id]=val;
+  row.querySelector('.pnote').textContent=val||' ';
+  clearTimeout(renderSum._t);
+  renderSum._t=setTimeout(renderSum,300);
+  save();
+});
+
+document.getElementById('fin').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  st.fin=b.getAttribute('data-fin');
+  Array.prototype.forEach.call(this.querySelectorAll('button'),function(x){
+    x.setAttribute('aria-pressed',String(x===b));
+  });
+  render();paintPrintHead();save();
+});
+document.getElementById('balc').addEventListener('change',function(){
+  st.balc=this.checked;render();save();
+});
+function setFilter(f){
+  st.filter=f;
+  Array.prototype.forEach.call(document.querySelectorAll('.filters2 button'),function(x){
+    x.setAttribute('aria-pressed',String(x.getAttribute('data-f')===f));
+  });
+  applyFilter();
+}
+document.querySelector('.filters2').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  setFilter(b.getAttribute('data-f'));
+});
+
+['mObj','mFlat','mDate'].forEach(function(id){
+  var el=document.getElementById(id),key=id.slice(1).toLowerCase();
+  el.addEventListener('input',function(){st.meta[key]=el.value;paintPrintHead();save()});
+});
+
+document.getElementById('btnCopy').addEventListener('click',function(){
+  var t=sumText();
+  goal('priemka_copy');
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){toast('список скопирован')},fb);
+  }else fb();
+  function fb(){
+    var ta=document.createElement('textarea');
+    ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');toast('список скопирован')}catch(err){toast('не вышло скопировать')}
+    document.body.removeChild(ta);
+  }
+});
+document.getElementById('btnPrint').addEventListener('click',function(){
+  goal('priemka_print');
+  setFilter('all');
+  paintPrintHead();
+  window.print();
+});
+document.getElementById('btnClear').addEventListener('click',function(){
+  if(!Object.keys(st.marks).length&&!Object.keys(st.notes).length){toast('отмечать пока нечего');return}
+  if(!window.confirm('Очистить все отметки и заметки? Отменить это будет нельзя.'))return;
+  st.marks={};st.notes={};
+  render();save();toast('отметки очищены');
+});
+Array.prototype.forEach.call(document.querySelectorAll('a[href^="https://t.me/"]'),function(a){
+  a.addEventListener('click',function(e){
+    goal('priemka_contact');
+    if(TG&&TG.openTelegramLink){e.preventDefault();TG.openTelegramLink(a.getAttribute('href'))}
+  });
+});
+
+/* ============ прочее ============ */
+var toastEl=document.getElementById('toast');
+function toast(msg){
+  toastEl.textContent=msg;toastEl.classList.add('on');
+  clearTimeout(toast._t);
+  toast._t=setTimeout(function(){toastEl.classList.remove('on')},2200);
+}
+function paintSaveMode(){
+  document.getElementById('pSave').textContent=canStore
+    ?'сохраняется на этом устройстве'
+    :'браузер не даёт сохранять — скопируйте список';
+}
+
+/* ============ старт ============ */
+load();
+Array.prototype.forEach.call(document.querySelectorAll('#fin button'),function(b){
+  b.setAttribute('aria-pressed',String(b.getAttribute('data-fin')===st.fin));
+});
+document.getElementById('balc').checked=st.balc;
+if(!st.meta.date){
+  var d=new Date();
+  st.meta.date=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+}
+document.getElementById('mObj').value=st.meta.obj||'';
+document.getElementById('mFlat').value=st.meta.flat||'';
+document.getElementById('mDate').value=st.meta.date||'';
+paintSaveMode();
+paintPrintHead();
+render();
+})();
+</script>
+</body>
+</html>

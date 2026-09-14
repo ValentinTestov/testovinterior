@@ -193,6 +193,17 @@ p{line-height:1.65}
 .fcontact .cp{margin-left:auto;font-size:12px;opacity:.7}
 
 /* ============ мобильные ============ */
+/* меню сворачивается в бургер раньше обычного: длинное имя в логотипе
+   и шесть пунктов перестают помещаться в строку уже около 950px */
+@media (max-width:960px){
+  .topin{position:relative}
+  .burger{display:block}
+  .nav{position:absolute;left:0;right:0;top:100%;flex-direction:column;align-items:stretch;gap:0;
+    background:var(--panel-2);border-bottom:1px solid var(--soft);display:none}
+  .nav.open{display:flex}
+  .nav a{padding:15px 18px;border-bottom:1px solid var(--soft);border-left:0;border-right:0;border-top:0}
+  .nav a.tg{border-color:var(--soft);color:var(--brass)}
+}
 @media (max-width:820px){
   .plans{grid-template-columns:1fr}
   .grid3{grid-template-columns:1fr}
@@ -201,13 +212,6 @@ p{line-height:1.65}
 @media (max-width:640px){
   .wrap{padding:20px 14px 50px}
   .sec{padding-top:40px}
-  .burger{display:block}
-  .nav{position:absolute;left:0;right:0;top:100%;flex-direction:column;align-items:stretch;gap:0;
-    background:var(--panel-2);border-bottom:1px solid var(--soft);display:none}
-  .nav.open{display:flex}
-  .nav a{padding:15px 18px;border-bottom:1px solid var(--soft);border-left:0;border-right:0;border-top:0}
-  .nav a.tg{border-color:var(--soft);color:var(--brass)}
-  .topin{position:relative}
   .brand{font-size:18px;letter-spacing:.18em}
   .grid2{grid-template-columns:1fr}
   .works{grid-template-columns:1fr}

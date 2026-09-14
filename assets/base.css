@@ -194,8 +194,8 @@ p{line-height:1.65}
 
 /* ============ мобильные ============ */
 /* меню сворачивается в бургер раньше обычного: длинное имя в логотипе
-   и шесть пунктов перестают помещаться в строку уже около 950px */
-@media (max-width:960px){
+   и семь пунктов перестают помещаться в строку уже около 1080px */
+@media (max-width:1080px){
   .topin{position:relative}
   .burger{display:block}
   .nav{position:absolute;left:0;right:0;top:100%;flex-direction:column;align-items:stretch;gap:0;

@@ -40,6 +40,22 @@
 
 .res{margin-top:32px}
 .scene{position:relative;border:1px solid var(--soft);background:#070E1A;line-height:0}
+.scene::before{content:"";position:absolute;inset:-1px;z-index:2;pointer-events:none;
+  background-image:linear-gradient(var(--brass),var(--brass)),linear-gradient(var(--brass),var(--brass)),
+    linear-gradient(var(--brass),var(--brass)),linear-gradient(var(--brass),var(--brass)),
+    linear-gradient(var(--brass),var(--brass)),linear-gradient(var(--brass),var(--brass)),
+    linear-gradient(var(--brass),var(--brass)),linear-gradient(var(--brass),var(--brass));
+  background-repeat:no-repeat;
+  background-size:28px 1px,1px 28px,28px 1px,1px 28px,28px 1px,1px 28px,28px 1px,1px 28px;
+  background-position:0 0,0 0,100% 0,100% 0,0 100%,0 100%,100% 100%,100% 100%}
+.scene::after{content:"";position:absolute;inset:6px;z-index:2;pointer-events:none;
+  background-image:linear-gradient(var(--step),var(--step)),linear-gradient(var(--step),var(--step)),
+    linear-gradient(var(--step),var(--step)),linear-gradient(var(--step),var(--step)),
+    linear-gradient(var(--step),var(--step)),linear-gradient(var(--step),var(--step)),
+    linear-gradient(var(--step),var(--step)),linear-gradient(var(--step),var(--step));
+  background-repeat:no-repeat;
+  background-size:13px 1px,1px 13px,13px 1px,1px 13px,13px 1px,1px 13px,13px 1px,1px 13px;
+  background-position:0 0,0 0,100% 0,100% 0,0 100%,0 100%,100% 100%,100% 100%}
 .scene svg{width:100%;height:auto;display:block}
 .scenecap{position:absolute;left:0;right:0;bottom:0;padding:8px 12px;font-family:var(--roman);font-size:11px;
   letter-spacing:.16em;text-transform:uppercase;color:#E8E3D6;background:linear-gradient(0deg,rgba(7,14,26,.82),transparent)}

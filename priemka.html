@@ -82,7 +82,8 @@
 .pbox,.pnote{display:none}
 
 .sum{margin-top:46px;border:1px solid var(--line);background:var(--panel);padding:26px 22px;position:relative}
-.sum::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--brass)}
+.sum::before{content:"";position:absolute;left:18%;right:18%;top:0;height:2px;background:var(--brass)}
+.sum::after{content:"";position:absolute;left:36%;right:36%;top:2px;height:2px;background:var(--brass)}
 .sumhead{font-family:var(--roman);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--brass);margin-bottom:14px}
 .sgroup{border-top:1px solid var(--soft);padding:14px 0 4px}
 .sgroup:first-child{border-top:0;padding-top:0}
@@ -146,7 +147,7 @@
   .pnote{display:block;font-size:12px;color:#000;margin-top:4px;border-bottom:1px solid #999;padding-bottom:2px}
   .inote{grid-column:2}
   .sum{border-color:#000;background:none;padding:14px 0 0;break-before:page}
-  .sum::before{display:none}
+  .sum::before,.sum::after{display:none}
   .sumhead,.sgt{color:#000}
   .sgroup li{color:#000;font-size:13px}
   .snote{display:none}

@@ -6,12 +6,12 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0A1220">
 <title>Услуги и цены — Valentin Testov</title>
-<meta name="description" content="Планировочное решение, дизайн-проект и сопровождение: что входит, сроки и стоимость.">
+<meta name="description" content="Пакеты дизайн-проекта и цены на отдельные чертежи: планировка, электрика, полы, потолки, развёртки. Что входит, сроки и стоимость.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230A1220'/%3E%3Cpath d='M16 7l7 9-7 9-7-9z' fill='%23C8A253'/%3E%3C/svg%3E" type="image/svg+xml">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ru_RU">
 <meta property="og:title" content="Услуги и цены — Valentin Testov">
-<meta property="og:description" content="Планировочное решение, дизайн-проект и сопровождение: что входит, сроки и стоимость.">
+<meta property="og:description" content="Пакеты дизайн-проекта и цены на отдельные чертежи: планировка, электрика, полы, потолки, развёртки. Что входит, сроки и стоимость.">
 <meta property="og:site_name" content="Valentin Testov">
 <meta property="og:url" content="https://valentintestov.github.io/testovinterior/services.html">
 <meta property="og:image" content="https://valentintestov.github.io/testovinterior/assets/og/services.png">
@@ -20,6 +20,111 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/fonts.css">
 <link rel="stylesheet" href="assets/base.css">
+<style>
+/* стили только этой страницы, общее — в assets/base.css */
+.muted a{color:var(--brass);text-decoration:none;border-bottom:1px solid var(--line)}
+.muted a:hover{color:var(--brass-hi);border-bottom-color:var(--brass)}
+
+/* ============ чертежи по отдельности ============ */
+#otdelno{scroll-margin-top:60px}
+#otdelno .lede{max-width:62ch}
+.ala{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:28px;align-items:start;margin-top:28px}
+.aarea{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;border:1px solid var(--soft);padding:14px 16px}
+.aarea label{font-family:var(--roman);font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--brass)}
+.ainp{display:flex;align-items:center;background:var(--bg);border:1px solid var(--soft)}
+.ainp:focus-within{border-color:var(--brass)}
+.ainp input{width:76px;background:none;border:0;outline:0;color:var(--cream);
+  font-family:var(--disp);font-weight:500;font-size:18px;letter-spacing:.04em;padding:9px 0 9px 12px}
+.ainp span{font-size:14px;color:var(--dim);padding:0 12px 0 4px}
+.ahelp{font-size:13px;color:var(--dim)}
+
+.agroup{margin-top:30px}
+.ahead{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;border-bottom:1px solid var(--soft);padding-bottom:10px}
+.six{font-family:var(--roman);font-size:12px;letter-spacing:.2em;color:var(--brass)}
+.atitle{font-family:var(--disp);font-weight:500;font-size:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--cream)}
+.ain{margin-left:auto;font-family:var(--roman);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+
+.arow{position:relative;display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:14px;align-items:start;
+  border-bottom:1px solid rgba(200,162,83,.09);padding:14px 0;cursor:pointer}
+.arow input{position:absolute;width:1px;height:1px;margin:0;opacity:0}
+.abox{width:20px;height:20px;margin-top:1px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  color:var(--brass);font-size:9px;line-height:1;transition:border-color .2s ease,background .2s ease}
+.arow:hover .abox{border-color:var(--brass)}
+.arow input:checked+.abox{border-color:var(--brass);background:rgba(200,162,83,.14)}
+.arow input:checked+.abox::before{content:"◆"}
+.arow input:focus-visible+.abox{outline:2px solid var(--brass-hi);outline-offset:2px}
+.arow.on{border-left:2px solid var(--brass);padding-left:12px;background:linear-gradient(90deg,rgba(200,162,83,.06),transparent 60%)}
+.atxt b{display:block;font-weight:400;font-size:15px;line-height:1.45;color:var(--cream)}
+.atxt span{display:block;font-size:13px;line-height:1.5;color:var(--dim);margin-top:4px}
+.ap{text-align:right;white-space:nowrap}
+.ap b{display:block;font-family:var(--disp);font-weight:500;font-size:16px;letter-spacing:.03em;line-height:1.45;color:var(--brass-hi)}
+.ap i{display:block;font-style:normal;font-size:12px;color:var(--dim);margin-top:4px}
+
+.asum{position:sticky;top:84px;border:1px solid var(--line);background:var(--panel);padding:24px 20px 20px;scroll-margin-top:84px}
+/* «ступени»: зиккурат, как у .cta */
+.asum::before{content:"";position:absolute;left:18%;right:18%;top:0;height:2px;background:var(--brass)}
+.asum::after{content:"";position:absolute;left:36%;right:36%;top:2px;height:2px;background:var(--brass)}
+.ashead{font-family:var(--roman);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--brass);margin-bottom:14px}
+.aempty{font-size:14px;line-height:1.6;color:var(--cream);margin:0}
+.alab{display:block;font-family:var(--roman);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.abig{display:block;font-family:var(--disp);font-weight:500;font-size:30px;letter-spacing:.02em;line-height:1.15;color:var(--brass-hi);margin:8px 0 4px}
+.asub{display:block;font-size:13px;line-height:1.5;color:var(--dim);margin:0}
+.apk{margin-top:16px;padding-top:14px;border-top:1px solid var(--soft)}
+.apkh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:4px}
+.apkh b{font-family:var(--disp);font-weight:500;font-size:19px;letter-spacing:.02em;color:var(--cream);white-space:nowrap}
+.averd{margin:16px 0 0;border-left:2px solid var(--soft);padding:3px 0 3px 12px;font-size:14px;line-height:1.55;color:#D6D1C4}
+.averd.pk{border-left-color:var(--brass);color:var(--cream)}
+.averd b{font-weight:500;color:var(--brass-hi);white-space:nowrap}
+.ahint{margin-top:14px;font-size:13px;line-height:1.55;color:var(--dim)}
+.aadd{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.aadd button{font-family:var(--util);font-size:12px;background:none;border:1px solid var(--soft);color:var(--cream);padding:8px 10px;cursor:pointer}
+.aadd button:hover{border-color:var(--brass);color:var(--brass)}
+.acmp{margin-top:16px;padding-top:14px;border-top:1px solid var(--soft)}
+.acmp div{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid rgba(200,162,83,.09)}
+.acmp div:last-child{border-bottom:0;padding-bottom:0}
+.acmp .n{font-family:var(--disp);font-weight:500;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--cream)}
+.acmp .v{font-size:13px;color:var(--dim);white-space:nowrap}
+.acmp s{margin-right:6px;opacity:.8}
+.acmp b{font-family:var(--disp);font-weight:500;font-size:15px;color:var(--brass-hi)}
+.aacts{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:18px;padding-top:16px;border-top:1px solid var(--soft)}
+.aacts[hidden],.abar[hidden]{display:none}
+.ghost{font-family:var(--roman);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  background:none;border:1px solid var(--soft);color:var(--cream);padding:12px 15px;cursor:pointer;text-decoration:none;display:inline-block}
+.ghost:hover{border-color:var(--brass);color:var(--brass)}
+.ghost.gold{border-color:var(--brass);color:var(--brass-hi)}
+.ghost.gold:hover{background:rgba(200,162,83,.12)}
+.aacts .gold{flex:1 1 100%;text-align:center}
+.areset{margin-left:auto;background:none;border:0;padding:10px 2px;cursor:pointer;
+  font-family:var(--roman);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.areset:hover{color:var(--brass)}
+.anote{margin:22px 0 0;max-width:70ch}
+.abar{display:none}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);z-index:50;
+  background:var(--panel-2);border:1px solid var(--line);color:var(--cream);
+  font-family:var(--roman);font-size:12px;letter-spacing:.12em;padding:12px 20px;max-width:calc(100vw - 32px);
+  opacity:0;pointer-events:none;transition:all .25s ease;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:900px){
+  .ala{grid-template-columns:minmax(0,1fr)}
+  .asum{position:relative;top:auto}
+  /* на телефоне расчёт оказывается под списком — итог едет следом в плашке снизу */
+  .abar{position:sticky;bottom:0;z-index:5;display:flex;align-items:center;gap:12px;margin-top:16px;padding:12px 14px;
+    background:rgba(22,34,58,.97);border:1px solid var(--line);box-shadow:0 -8px 22px rgba(4,9,18,.55);
+    color:var(--cream);text-decoration:none}
+  .abar b{display:block;font-family:var(--disp);font-weight:500;font-size:17px;letter-spacing:.02em;color:var(--brass-hi)}
+  .abar small{display:block;font-size:12px;line-height:1.4;color:var(--dim);margin-top:2px}
+  .abar .go{margin-left:auto;font-family:var(--roman);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brass);white-space:nowrap}
+}
+@media (max-width:640px){
+  .arow{gap:12px}
+  .ap b{font-size:15px}
+  .ain{margin-left:0;width:100%}
+  .asum{padding:22px 16px 18px}
+}
+@media (prefers-reduced-motion:reduce){.abox,.toast{transition:none}}
+</style>
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -63,11 +168,11 @@
 
   <section class="sec">
     <div class="tariffs">
-      <div class="tar">
+      <div class="tar" data-pkg="mebel">
         <div class="tarhead"><b>Мебель</b><span class="tprice">1000 ₽/м²</span></div>
         <p>Обмеры, мудборд, три варианта расстановки, список мебели с артикулами, рекомендации по стилю и эргономике. Идеально для тех, кто знает, что нужно переделать.</p>
       </div>
-      <div class="tar">
+      <div class="tar" data-pkg="baza">
         <div class="tarhead"><b>База</b><span class="tprice">1500 ₽/м²</span></div>
         <p>Планы демонтажа и монтажа, полов, потолков, освещения и розеток, развёртки стен, дополнительные планы вентиляции и водоснабжения для согласования с подрядчиками. Всё что нужно бригаде для качественного выполнения работ. Подходит для жилых и коммерческих помещений.</p>
       </div>
@@ -88,7 +193,94 @@
         <p>Рендеры без проектной документации. Стоимость зависит от площади и количества ракурсов. Подходит для вдохновения или презентации идеи.</p>
       </div>
     </div>
-    <p class="muted" style="margin-top:18px">Итоговая цена зависит от сложности и наполнения проекта, обговаривается индивидуально после обсуждения всех деталей.</p>
+    <p class="muted" style="margin-top:18px">Итоговая цена зависит от сложности и наполнения проекта, обговаривается индивидуально после обсуждения всех деталей. Нужен не весь проект, а отдельные чертежи — <a href="#otdelno">цены на каждый ниже</a>.</p>
+  </section>
+
+  <section class="sec" id="otdelno">
+    <h2>Чертежи по отдельности</h2>
+    <p class="lede left">Если весь проект не нужен — например, бригаде не хватает только электрики или планировка у вас уже есть, — чертежи можно заказать по одному. Отметьте нужные и укажите площадь: калькулятор посчитает сумму и сравнит её с пакетом.</p>
+
+    <div class="ala">
+      <div class="acol">
+        <div class="aarea">
+          <label for="area">Площадь помещения</label>
+          <span class="ainp"><input id="area" type="text" inputmode="decimal" value="50" maxlength="7" autocomplete="off"><span>м²</span></span>
+          <span class="ahelp">суммы в строках пересчитаются под неё</span>
+        </div>
+
+        <!-- Цену чертежа меняйте прямо в тексте «… ₽/м²» — калькулятор берёт её оттуда.
+             data-pkg группы — пакет, в который входят её чертежи (цена пакета берётся из тарифа выше).
+             data-needs — без каких чертежей этот не начертить: калькулятор подскажет их добавить. -->
+        <div class="agroup" data-pkg="mebel">
+          <div class="ahead"><span class="six">I</span><span class="atitle">Планировка и мебель</span><span class="ain">есть в любом пакете</span></div>
+          <label class="arow"><input type="checkbox" value="obmer"><span class="abox" aria-hidden="true"></span>
+            <span class="atxt"><b>Обмерный план</b><span>Точные размеры помещений, высоты, проёмы, стояки и щиток. Основа, по которой строятся все остальные чертежи.</span></span>
+            <span class="ap"><b>150 ₽/м²</b><i></i></span></label>
+          <label class="arow" data-needs="obmer"><input type="checkbox" value="plan"><span class="abox" aria-hidden="true"></span>
+            <span class="atxt"><b>Планировочное решение</b><span>Три варианта расстановки мебели с плюсами и минусами каждого, выбранный дорабатываю с учётом эргономики.</span></span>
+            <span class="ap"><b>500 ₽/м²</b><i></i></span></label>
+          <label class="arow"><input type="checkbox" value="mood"><span class="abox" aria-hidden="true"></span>
+            <span class="atxt"><b>Мудборд и рекомендации по стилю</b><span>Настроение интерьера, цвета и материалы — чтобы покупки складывались в одну картину.</span></span>
+            <span class="ap"><b>150 ₽/м²</b><i></i></span></label>
+          <label class="arow" data-needs="obmer plan"><input type="checkbox" value="spisok"><span class="abox" aria-hidden="true"></span>
+            <span class="atxt"><b>Список мебели с артикулами</b><span>Конкретные модели под вашу расстановку: артикулы, размеры, количество. Можно сразу заказывать.</span></span>
+            <span class="ap"><b>300 ₽/м²</b><i></i></span></label>
+        </div>
+
+        <div class="agroup" data-pkg="baza">
+          <div class="ahead"><span class="six">II</span><span class="atitle">Рабочие чертежи</span><span class="ain">есть в пакетах от «Базы»</span></div>
+          <label class="arow" data-needs="obmer plan"><input type="checkbox" value="demont"><span class="abox" aria-hidden="true"></span>
+            <span class="atxt"><b>План демонтажа</b><span>Какие стены и перегородки сносим, какие проёмы расширяем, где снимаем старую отделку.</span></span>
+            <span class="ap"><b>100 ₽/м²</b><i></i></span></label>
+          <label class="arow" data-needs="obmer plan"><input type="checkbox" value="mont"><span class="abox" aria-hidden="true"></span>
+            <span class="atxt"><b>План монтажа перегородок</b><span>Новые стены и перегородки с размерами, материалом и привязками, дверные проёмы.</span></span>
+            <span class="ap"><b>150 ₽/м²</b><i></i></span></label>
+          <label class="arow" data-needs="obmer plan"><input type="checkbox" value="poly"><span class="abox" aria-hidden="true"></span>
+            <span class="atxt"><b>План полов</b><span>Покрытия по зонам, направление укладки, тёплый пол, пороги и перепады уровней.</span></span>
+            <span class="ap"><b>150 ₽/м²</b><i></i></span></label>
+          <label class="arow" data-needs="obmer plan"><input type="checkbox" value="potolki"><span class="abox" aria-hidden="true"></span>
+            <span class="atxt"><b>План потолков</b><span>Уровни и высоты, материалы, короба, ниши под карнизы и подсветку.</span></span>
+            <span class="ap"><b>200 ₽/м²</b><i></i></span></label>
+          <label class="arow" data-needs="obmer plan"><input type="checkbox" value="svet"><span class="abox" aria-hidden="true"></span>
+            <span class="atxt"><b>План освещения и выключателей</b><span>Светильники с привязками, группы и выключатели, в том числе проходные — свет включается там, где удобно.</span></span>
+            <span class="ap"><b>200 ₽/м²</b><i></i></span></label>
+          <label class="arow" data-needs="obmer plan"><input type="checkbox" value="rozetki"><span class="abox" aria-hidden="true"></span>
+            <span class="atxt"><b>План розеток и выводов</b><span>Розетки и выводы под технику с высотами и привязками, отдельные линии под мощные приборы.</span></span>
+            <span class="ap"><b>200 ₽/м²</b><i></i></span></label>
+          <label class="arow" data-needs="obmer plan"><input type="checkbox" value="razv"><span class="abox" aria-hidden="true"></span>
+            <span class="atxt"><b>Развёртки стен</b><span>Вид на каждую стену: отделка, проёмы, высоты розеток, выводов и встроенной мебели.</span></span>
+            <span class="ap"><b>300 ₽/м²</b><i></i></span></label>
+          <label class="arow" data-needs="obmer plan"><input type="checkbox" value="voda"><span class="abox" aria-hidden="true"></span>
+            <span class="atxt"><b>План водоснабжения и канализации</b><span>Сантехприборы, выводы воды и канализации с высотами, подключение стиральной и посудомоечной машин.</span></span>
+            <span class="ap"><b>150 ₽/м²</b><i></i></span></label>
+          <label class="arow" data-needs="obmer plan"><input type="checkbox" value="vent"><span class="abox" aria-hidden="true"></span>
+            <span class="atxt"><b>План вентиляции и кондиционирования</b><span>Вытяжки и решётки, места под внутренние блоки кондиционеров, трассы и дренаж — для согласования с подрядчиками.</span></span>
+            <span class="ap"><b>150 ₽/м²</b><i></i></span></label>
+        </div>
+
+        <a class="abar" id="abar" href="#asum" hidden></a>
+      </div>
+
+      <aside class="asum" id="asum" aria-label="Расчёт стоимости чертежей">
+        <div class="ashead">ваш расчёт</div>
+        <div id="asBody">
+          <p class="aempty">Отметьте нужные чертежи — посчитаю сумму для вашей площади и сравню с пакетом.</p>
+          <div class="acmp">
+            <p class="asub">Пакетом выгоднее, чем все его позиции по одной:</p>
+            <div><span class="n">«Мебель»</span><span class="v"><s><span class="sr">отдельно </span>1100</s> <b><span class="sr">пакетом </span>1000&nbsp;₽/м²</b></span></div>
+            <div><span class="n">«База»</span><span class="v"><s><span class="sr">отдельно </span>2700</s> <b><span class="sr">пакетом </span>1500&nbsp;₽/м²</b></span></div>
+          </div>
+        </div>
+        <div class="aacts" id="aActs" hidden>
+          <a class="ghost gold" id="aTg" href="https://t.me/vtestov" target="_blank" rel="noopener">отправить в telegram</a>
+          <button type="button" class="ghost" id="aCopy">скопировать</button>
+          <button type="button" class="areset" id="aReset">сбросить</button>
+        </div>
+        <p class="sr" id="aLive" aria-live="polite"></p>
+      </aside>
+    </div>
+
+    <p class="muted anote">Чертежи строятся по обмерам, а электрика, сантехника и развёртки — ещё и по расстановке мебели. Если обмеры или планировка у вас уже есть, пришлите — посмотрю, можно ли работать по ним. Цены здесь — ориентир, итоговую назову после брифа.</p>
   </section>
 
   <section class="sec">
@@ -136,6 +328,217 @@
     </div>
   </div>
 </footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <script src="assets/site.js"></script>
+<script>
+(function(){
+"use strict";
+
+var METRIKA_ID=112145522;
+/* цели Метрики: services_calc, services_copy, services_tg */
+var sent={};
+function goal(n){if(sent[n])return;sent[n]=true;if(window.ym){try{ym(METRIKA_ID,'reachGoal',n)}catch(e){}}}
+
+var root=document.getElementById('otdelno');
+if(!root)return;
+function each(list,fn){Array.prototype.forEach.call(list,fn)}
+
+/* ============ данные из разметки ============
+   Цены не дублируются в коде: калькулятор читает их из текста строк и тарифов,
+   поэтому достаточно поправить цифру на странице. */
+function num(t){var d=String(t).split('₽')[0].replace(/\D/g,'');return d?parseInt(d,10):NaN}
+
+var GROUPS=[],ITEMS=[],BYID={};
+each(root.querySelectorAll('.agroup'),function(g,gi){
+  var tar=document.querySelector('.tar[data-pkg="'+g.getAttribute('data-pkg')+'"]');
+  GROUPS.push({
+    name:tar?tar.querySelector('.tarhead b').textContent.trim():'',
+    price:tar?num(tar.querySelector('.tprice').textContent):NaN
+  });
+  each(g.querySelectorAll('.arow'),function(r){
+    var it={
+      id:r.querySelector('input').value,
+      name:r.querySelector('.atxt b').textContent.trim(),
+      price:num(r.querySelector('.ap b').textContent),
+      rank:gi,
+      needs:(r.getAttribute('data-needs')||'').split(/\s+/).filter(Boolean),
+      row:r,inp:r.querySelector('input'),amt:r.querySelector('.ap i')
+    };
+    if(!isFinite(it.price))it.price=0;
+    ITEMS.push(it);BYID[it.id]=it;
+  });
+});
+
+/* ============ формат ============ */
+var NB=' ';
+/* как в тарифах: 1500, но 10 000 */
+function fmt(n){var s=String(Math.round(n));return s.length>4?s.replace(/\B(?=(\d{3})+(?!\d))/g,NB):s}
+function plural(n,one,few,many){
+  var a=n%10,b=n%100;
+  if(a===1&&b!==11)return one;
+  if(a>=2&&a<=4&&(b<12||b>14))return few;
+  return many;
+}
+function poz(n){return n+NB+plural(n,'позиция','позиции','позиций')}
+function low(s){return s.charAt(0).toLowerCase()+s.slice(1)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+var areaEl=document.getElementById('area');
+function area(){
+  var v=parseFloat(String(areaEl.value).replace(/\s/g,'').replace(',','.'));
+  return isFinite(v)&&v>0&&v<=100000?Math.round(v*10)/10:0;
+}
+function fmtArea(a){return String(a).replace('.',',')}
+
+/* ============ расчёт ============ */
+function calc(){
+  var c={a:area(),sel:[],m2:0,rank:-1,pkg:null,extra:[],miss:[]},need={};
+  ITEMS.forEach(function(i){
+    if(!i.inp.checked)return;
+    c.sel.push(i);c.m2+=i.price;
+    if(i.rank>c.rank)c.rank=i.rank;
+    i.needs.forEach(function(n){need[n]=1});
+  });
+  c.unit=c.a?'₽':'₽/м²';
+  c.sep=c.a?Math.round(c.m2*c.a):c.m2;
+  /* пакеты накопительные: подходит пакет самой «старшей» из отмеченных групп,
+     и в нём есть всё из младших групп */
+  if(c.sel.length&&isFinite(GROUPS[c.rank].price)){
+    c.pkg=GROUPS[c.rank];
+    c.pk=c.a?Math.round(c.pkg.price*c.a):c.pkg.price;
+    c.extra=ITEMS.filter(function(i){return i.rank<=c.rank&&!i.inp.checked});
+  }
+  c.miss=ITEMS.filter(function(i){return need[i.id]&&!i.inp.checked});
+  return c;
+}
+
+function cmpHTML(){
+  var rows='',acc=0;
+  GROUPS.forEach(function(g,gi){
+    ITEMS.forEach(function(i){if(i.rank===gi)acc+=i.price});
+    if(!isFinite(g.price))return;
+    rows+='<div><span class="n">«'+esc(g.name)+'»</span><span class="v"><s><span class="sr">отдельно </span>'+fmt(acc)+'</s> '
+      +'<b><span class="sr">пакетом </span>'+fmt(g.price)+NB+'₽/м²</b></span></div>';
+  });
+  return rows?'<div class="acmp"><p class="asub">Пакетом выгоднее, чем все его позиции по одной:</p>'+rows+'</div>':'';
+}
+
+function verdict(c){
+  var diff=c.pk-c.sep,n=c.extra.length,u=NB+c.unit,
+      more=n===1?'ещё '+esc(low(c.extra[0].name)):'ещё '+poz(n);
+  if(diff<0)return 'Пакетом выгоднее на <b>'+fmt(-diff)+u+'</b>'+(n?', и в нём '+more:'')+'.';
+  if(diff===0)return 'Пакетом — столько же'+(n?', но в нём '+more:'')+'.';
+  if(n&&diff<=c.pk*0.15)return 'Пакет дороже всего на <b>'+fmt(diff)+u+'</b>, зато в нём '+more+'.';
+  return 'Отдельно дешевле пакета на <b>'+fmt(diff)+u+'</b>.';
+}
+
+function hintHTML(c){
+  var ids=c.miss.map(function(i){return i.id}).join(' '),t;
+  if(ids==='obmer plan')t='Эти чертежи строятся по обмерам и расстановке мебели. Если своих нет — добавьте:';
+  else if(ids==='obmer')t='Чертежи строятся по обмерам. Если своих нет — добавьте:';
+  else if(ids==='plan')t='Эти чертежи привязываются к расстановке мебели. Если своей планировки нет — добавьте:';
+  else t='Для этих чертежей нужна основа. Если своей нет — добавьте:';
+  return '<div class="ahint">'+t+'<span class="aadd">'+c.miss.map(function(i){
+    return '<button type="button" data-add="'+esc(i.id)+'">+ '+esc(low(i.name))+'</button>';
+  }).join('')+'</span></div>';
+}
+
+function text(c){
+  var a=c.a,out=['Чертежи по отдельности'+(a?' — площадь '+fmtArea(a)+' м²':''),''];
+  c.sel.forEach(function(i,k){
+    out.push((k+1)+'. '+i.name+' — '+(a?fmt(i.price*a)+' ₽ ('+i.price+' ₽/м²)':i.price+' ₽/м²'));
+  });
+  out.push('');
+  out.push('Итого отдельно: '+fmt(c.sep)+' '+c.unit+(a?' ('+fmt(c.m2)+' ₽/м²)':''));
+  if(c.pkg)out.push('Для сравнения, пакет «'+c.pkg.name+'»: '+fmt(c.pk)+' '+c.unit+(a?' ('+fmt(c.pkg.price)+' ₽/м²)':''));
+  out.push('');
+  out.push('Расчёт со страницы «Услуги и цены» · Valentin Testov');
+  return out.join('\n').replace(/ /g,' ');
+}
+
+/* ============ отрисовка ============ */
+var body=document.getElementById('asBody'),acts=document.getElementById('aActs'),
+    bar=document.getElementById('abar'),live=document.getElementById('aLive'),
+    tg=document.getElementById('aTg'),TG_URL=tg.getAttribute('href');
+
+function render(){
+  var c=calc(),a=c.a,h;
+  ITEMS.forEach(function(i){
+    i.row.classList.toggle('on',i.inp.checked);
+    i.amt.textContent=a?fmt(i.price*a)+NB+'₽':'';
+  });
+  if(!c.sel.length){
+    body.innerHTML='<p class="aempty">Отметьте нужные чертежи — посчитаю сумму для вашей площади и сравню с пакетом.</p>'+cmpHTML();
+    acts.hidden=true;bar.hidden=true;live.textContent='';
+    tg.setAttribute('href',TG_URL);
+    return;
+  }
+  var u=NB+c.unit;
+  h='<div class="atot"><span class="alab">отдельно · '+poz(c.sel.length)+'</span>'
+    +'<b class="abig">'+fmt(c.sep)+u+'</b>'
+    +'<span class="asub">'+(a?fmt(c.m2)+NB+'₽/м² × '+fmtArea(a)+NB+'м²':'укажите площадь — посчитаю в рублях')+'</span></div>';
+  if(c.pkg){
+    h+='<div class="apk"><div class="apkh"><span class="alab">пакет «'+esc(c.pkg.name)+'»</span><b>'+fmt(c.pk)+u+'</b></div>'
+      +'<span class="asub">'+(a?fmt(c.pkg.price)+NB+'₽/м² · ':'')
+      +(c.extra.length?'всё отмеченное и ещё '+poz(c.extra.length):'ровно то, что отмечено')+'</span></div>'
+      +'<p class="averd'+(c.pk<=c.sep?' pk':'')+'">'+verdict(c)+'</p>';
+  }
+  if(c.miss.length)h+=hintHTML(c);
+  body.innerHTML=h;
+  acts.hidden=false;bar.hidden=false;
+  bar.innerHTML='<span><b>'+fmt(c.sep)+u+'</b><small>'+poz(c.sel.length)
+    +(c.pkg?' · пакет «'+esc(c.pkg.name)+'» — '+fmt(c.pk)+u:'')+'</small></span><span class="go">расчёт ↓</span>';
+  live.textContent='Отдельно '+fmt(c.sep)+' '+c.unit+(c.pkg?', пакет «'+c.pkg.name+'» — '+fmt(c.pk)+' '+c.unit:'');
+  tg.setAttribute('href',TG_URL+'?text='+encodeURIComponent(text(c)));
+}
+
+/* ============ события ============ */
+root.addEventListener('change',function(e){
+  if(e.target.type!=='checkbox')return;
+  goal('services_calc');render();
+});
+areaEl.addEventListener('input',render);
+body.addEventListener('click',function(e){
+  var b=e.target.closest('[data-add]'),it=b&&BYID[b.getAttribute('data-add')];
+  if(!it)return;
+  it.inp.checked=true;render();
+  toast('добавлено: '+low(it.name));
+});
+document.getElementById('aCopy').addEventListener('click',function(){
+  goal('services_copy');copyText(text(calc()),'расчёт скопирован');
+});
+/* ссылка сама подставляет расчёт в чат; копия в буфере — на случай старого Telegram */
+tg.addEventListener('click',function(){
+  goal('services_tg');copyText(text(calc()),'расчёт скопирован — отправьте его в чате');
+});
+document.getElementById('aReset').addEventListener('click',function(){
+  ITEMS.forEach(function(i){i.inp.checked=false});
+  render();
+});
+
+function copyText(t,msg){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){toast(msg)},fb);
+  }else fb();
+  function fb(){
+    var ta=document.createElement('textarea');
+    ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');toast(msg)}catch(err){toast('не вышло скопировать')}
+    document.body.removeChild(ta);
+  }
+}
+var toastEl=document.getElementById('toast');
+function toast(msg){
+  toastEl.textContent=msg;toastEl.classList.add('on');
+  clearTimeout(toast._t);
+  toast._t=setTimeout(function(){toastEl.classList.remove('on')},2200);
+}
+
+render();
+})();
+</script>
 </body>
 </html>

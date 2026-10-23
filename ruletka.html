@@ -1136,14 +1136,21 @@ if(window.Promise)wmReady=new Promise(wmBind);else wmBind();
 WM.crossOrigin='anonymous';
 WM.src='assets/img/logo.png';
 
-/* знак стоит над подписью, где у карточки обычно пусто, и рисуется до текста:
-   если идея длинная и текст до него дойдёт, текст ляжет поверх знака */
+/* знак повторяется по диагонали в пяти точках, как на кубике, и рисуется под всем
+   содержимым: плашки палитры и текст ложатся поверх и ничем не перекрываются */
+var WM_SPOTS=[[215,290],[865,290],[540,660],[215,1030],[865,1030]];
 function watermark(g,W,H,M){
   if(!wmOK)return;
-  var ww=560,wh=Math.round(ww*WM.naturalHeight/WM.naturalWidth);
+  var ww=500,wh=Math.round(ww*WM.naturalHeight/WM.naturalWidth);
   g.save();
-  g.globalAlpha=0.2;
-  g.drawImage(WM,Math.round((W-ww)/2),H-M-88-wh,ww,wh);
+  g.beginPath();g.rect(M-18,M-18,W-(M-18)*2,H-(M-18)*2);g.clip();
+  g.globalAlpha=0.11;
+  WM_SPOTS.forEach(function(p){
+    g.save();
+    g.translate(p[0],p[1]);g.rotate(-Math.PI/3);
+    g.drawImage(WM,-ww/2,-wh/2,ww,wh);
+    g.restore();
+  });
   g.restore();
 }
 
@@ -1159,13 +1166,13 @@ function exportPNG(r,onBlob){
   g.textBaseline='alphabetic';
   g.fillStyle=BG;g.fillRect(0,0,W,H);
   g.fillStyle=PANEL;g.fillRect(M-18,M-18,CW+36,H-(M-18)*2);
+  watermark(g,W,H,M);
   g.strokeStyle=SOFT;g.lineWidth=1;
   g.strokeRect(M-18.5,M-18.5,CW+37,H-(M-18)*2+1);
   g.strokeRect(M-9.5,M-9.5,CW+19,H-(M-9)*2+1);
   g.strokeStyle=BRASS;
   corner(g,M-18,M-18,1,1,26,2);corner(g,W-M+18,M-18,-1,1,26,2);
   corner(g,M-18,H-M+18,1,-1,26,2);corner(g,W-M+18,H-M+18,-1,-1,26,2);
-  watermark(g,W,H,M);
 
   g.font='400 20px Forum, Georgia, serif';g.fillStyle=BRASS;
   tracked(g,'ВАША ИДЕЯ №'+r.n,M,M+20,5);

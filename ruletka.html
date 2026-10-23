@@ -1146,7 +1146,7 @@ function watermark(g,W,H,M){
   var rows=Math.ceil(R/sy)+1,cols=Math.ceil(R/sx)+1,r,c,x;
   g.save();
   g.beginPath();g.rect(M-18,M-18,W-(M-18)*2,H-(M-18)*2);g.clip();
-  g.globalAlpha=0.1;
+  g.globalAlpha=0.2;
   g.translate(W/2,H/2);g.rotate(-Math.PI/3);
   for(r=-rows;r<=rows;r++){
     for(c=-cols;c<=cols;c++){

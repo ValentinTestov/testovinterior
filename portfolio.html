@@ -22,6 +22,9 @@
 <link rel="stylesheet" href="assets/base.css">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
+    /* отказ от cookie (плашка внизу, assets/site.js) — счётчик не грузим */
+    var ckOff=false;try{ckOff=localStorage.getItem('ck')==='no'}catch(x){}
+    if(!ckOff){
     (function(m,e,t,r,i,k,a){
         m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
         m[i].l=1*new Date();
@@ -30,6 +33,7 @@
     })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=112145522', 'ym');
 
     ym(112145522, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    }
 </script>
 <noscript><div><img src="https://mc.yandex.ru/watch/112145522" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
@@ -119,7 +123,8 @@
     <nav><a href="index.html">Главная</a><a href="portfolio.html">Портфолио</a><a href="ruletka.html">Рулетка</a><a href="palitra.html">Палитра</a><a href="priemka.html">Приёмка</a><a href="services.html">Услуги и цены</a></nav>
     <div class="fcontact">
       <span>Связаться: <a href="https://t.me/vtestov" target="_blank" rel="noopener">t.me/vtestov</a></span>
-      <span class="cp">© 2026 Valentin Testov · дизайн интерьера</span>
+      <span class="flegal"><a href="pravila.html#usloviya">Условия использования</a><a href="pravila.html#konfidencialnost">Конфиденциальность</a></span>
+      <span class="cp">© 2026 Valentin Testov · все права защищены</span>
     </div>
   </div>
 </footer>

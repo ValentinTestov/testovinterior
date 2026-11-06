@@ -226,6 +226,9 @@ p{line-height:1.65}
 .fcontact a{color:var(--brass);text-decoration:none}
 .fcontact a:hover{color:var(--brass-hi)}
 .fcontact .cp{margin-left:auto;font-size:12px;opacity:.7}
+.fcontact .flegal{display:flex;flex-wrap:wrap;gap:6px 16px}
+.fcontact .flegal a{color:var(--dim);font-size:12px;border-bottom:1px solid var(--soft)}
+.fcontact .flegal a:hover{color:var(--brass);border-bottom-color:var(--brass)}
 
 /* ============ мобильные ============ */
 /* меню сворачивается в бургер раньше обычного: длинное имя в логотипе

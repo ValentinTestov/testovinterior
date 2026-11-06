@@ -38,6 +38,9 @@
 </style>
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
+    /* отказ от cookie (плашка внизу, assets/site.js) — счётчик не грузим */
+    var ckOff=false;try{ckOff=localStorage.getItem('ck')==='no'}catch(x){}
+    if(!ckOff){
     (function(m,e,t,r,i,k,a){
         m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
         m[i].l=1*new Date();
@@ -46,6 +49,7 @@
     })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=112145522', 'ym');
 
     ym(112145522, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    }
 </script>
 <noscript><div><img src="https://mc.yandex.ru/watch/112145522" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
@@ -122,11 +126,13 @@
   <section class="sec">
     <h2 id="konfidencialnost">Политика конфиденциальности</h2>
 
-    <p class="note">На сайте нет регистрации и форм. Свои данные вы не вводите — кроме случаев, когда сами пишете автору в Telegram. Статистику посещений собирает Яндекс.Метрика.</p>
+    <p class="note">На сайте нет регистрации и форм. Свои данные вы не вводите — кроме случаев, когда сами пишете автору в Telegram. Статистику посещений собирает Яндекс.Метрика — от неё можно отказаться.</p>
 
     <h3>1. Яндекс.Метрика</h3>
     <p>На сайте установлен счётчик Яндекс.Метрики, в том числе Вебвизор и карта кликов. Он использует файлы cookie и собирает обезличенные технические данные: IP-адрес, тип устройства и браузера, источник перехода, просмотренные страницы, время на сайте, клики и прокрутку. Эти данные нужны только для статистики и улучшения сайта и не используются для того, чтобы установить вашу личность.</p>
     <p>Данные обрабатывает ООО «ЯНДЕКС» в соответствии со своей <a href="https://yandex.ru/legal/confidential/" target="_blank" rel="noopener">политикой конфиденциальности</a>. Чтобы отказаться от сбора, отключите cookie в браузере, используйте блокировщик трекеров или установите <a href="https://yandex.ru/support/metrica/general/opt-out.html" target="_blank" rel="noopener">блокировщик Яндекс.Метрики</a>. Сайт продолжит работать.</p>
+    <p>При первом заходе внизу экрана появляется плашка о cookie. Если нажать «Отказаться», cookie Метрики удаляются, и счётчик больше не загружается в этом браузере. Выбор хранится в локальном хранилище браузера, изменить его можно здесь:</p>
+    <div class="btns" style="justify-content:flex-start;margin:4px 0 12px"><button type="button" class="btn quiet" id="ckreset">Изменить выбор по cookie</button></div>
 
     <h3>2. Данные в вашем браузере</h3>
     <p>«Рулетка интерьера» и «Чек-лист приёмки» сохраняют ваш прогресс (отметки, заметки, настройки звука) в локальном хранилище вашего браузера, а при запуске внутри Telegram — в облачном хранилище Telegram вашего аккаунта. Автор эти данные не получает и на свой сервер не отправляет. Удалить их можно, очистив данные сайта в настройках браузера.</p>

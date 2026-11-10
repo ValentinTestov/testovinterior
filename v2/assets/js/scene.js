@@ -283,28 +283,72 @@ function init(){
 
   /* ---------- постобработка: фокус, затемнение, капля стекла ---------- */
   let rt=null;
+  /* Размытие фона — цепочка «вниз-вверх» (dual Kawase): кадр несколько раз уменьшается вдвое с мягкой выборкой
+     и так же плавно собирается обратно. Пятно получается ровным, без квадратов, которые давали мип-уровни,
+     а стоит дёшево: все проходы идут по маленьким копиям кадра. */
+  const blurDown=[],blurUp=[];
+  const QUAD_VS='varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}';
+  const downMat=new THREE.ShaderMaterial({
+    depthTest:false,depthWrite:false,uniforms:{tSrc:{value:null},uH:{value:new THREE.Vector2()}},vertexShader:QUAD_VS,
+    fragmentShader:`varying vec2 vUv;uniform sampler2D tSrc;uniform vec2 uH;
+      void main(){vec3 s=texture2D(tSrc,vUv).rgb*4.;
+        s+=texture2D(tSrc,vUv-uH).rgb+texture2D(tSrc,vUv+uH).rgb+texture2D(tSrc,vUv+vec2(uH.x,-uH.y)).rgb+texture2D(tSrc,vUv-vec2(uH.x,-uH.y)).rgb;
+        gl_FragColor=vec4(s/8.,1.);}`
+  });
+  const upMat=new THREE.ShaderMaterial({
+    depthTest:false,depthWrite:false,uniforms:{tSrc:{value:null},uH:{value:new THREE.Vector2()}},vertexShader:QUAD_VS,
+    fragmentShader:`varying vec2 vUv;uniform sampler2D tSrc;uniform vec2 uH;
+      void main(){vec3 s=texture2D(tSrc,vUv+vec2(-uH.x*2.,0.)).rgb+texture2D(tSrc,vUv+vec2(0.,uH.y*2.)).rgb
+          +texture2D(tSrc,vUv+vec2(uH.x*2.,0.)).rgb+texture2D(tSrc,vUv+vec2(0.,-uH.y*2.)).rgb;
+        s+=(texture2D(tSrc,vUv+vec2(-uH.x,uH.y)).rgb+texture2D(tSrc,vUv+uH).rgb
+          +texture2D(tSrc,vUv+vec2(uH.x,-uH.y)).rgb+texture2D(tSrc,vUv-uH).rgb)*2.;
+        gl_FragColor=vec4(s/12.,1.);}`
+  });
+  const blurMesh=new THREE.Mesh(tri,downMat);blurMesh.frustumCulled=false;
+  const blurScene=new THREE.Scene();blurScene.add(blurMesh);
+  const lowRT=(w,h)=>new THREE.WebGLRenderTarget(w,h,{type:THREE.HalfFloatType,depthBuffer:false,minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter});
   function makeRT(){
     if(rt)rt.dispose();
-    const t=TIERS[tier];
-    rt=new THREE.WebGLRenderTarget(Math.max(2,Math.round(W*dpr)),Math.max(2,Math.round(H*dpr)),
-      {type:THREE.HalfFloatType,samples:t.msaa,depthBuffer:true,generateMipmaps:true,minFilter:THREE.LinearMipmapLinearFilter,magFilter:THREE.LinearFilter});
+    blurDown.concat(blurUp).forEach(t=>t.dispose());blurDown.length=0;blurUp.length=0;
+    const t=TIERS[tier],rw=Math.max(2,Math.round(W*dpr)),rh=Math.max(2,Math.round(H*dpr));
+    rt=new THREE.WebGLRenderTarget(rw,rh,{type:THREE.HalfFloatType,samples:t.msaa,depthBuffer:true,minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter});
+    /* ступеней столько, чтобы самая мелкая копия была 60–90 точек по длинной стороне:
+       тогда размытие одинаково мягкое и на телефоне, и на большом мониторе */
+    const n=clamp(Math.round(Math.log2(Math.max(rw,rh)/70)),3,6);
+    let w=rw,h=rh;
+    for(let i=0;i<n;i++){w=Math.max(2,Math.round(w/2));h=Math.max(2,Math.round(h/2));blurDown.push(lowRT(w,h))}
+    for(let i=n-2;i>=0;i--)blurUp.push(lowRT(blurDown[i].width,blurDown[i].height));
     postMat.uniforms.tScene.value=rt.texture;
+    postMat.uniforms.tBlur.value=blurUp[blurUp.length-1].texture;
+  }
+  function runBlur(){
+    let src=rt;
+    blurMesh.material=downMat;
+    for(const d of blurDown){
+      downMat.uniforms.tSrc.value=src.texture;downMat.uniforms.uH.value.set(.5/d.width,.5/d.height);
+      renderer.setRenderTarget(d);renderer.render(blurScene,postCam);src=d;
+    }
+    blurMesh.material=upMat;
+    for(const u of blurUp){
+      upMat.uniforms.tSrc.value=src.texture;upMat.uniforms.uH.value.set(.5/src.width,.5/src.height);
+      renderer.setRenderTarget(u);renderer.render(blurScene,postCam);src=u;
+    }
   }
   const postMat=new THREE.ShaderMaterial({
     depthTest:false,depthWrite:false,
-    uniforms:{tScene:{value:null},uRes:{value:new THREE.Vector2(1,1)},uTime:{value:0},uDefocus:{value:0},uDim:{value:0},uLensOn:{value:0},uPx:{value:1},
+    uniforms:{tScene:{value:null},tBlur:{value:null},uRes:{value:new THREE.Vector2(1,1)},uTime:{value:0},uDefocus:{value:0},uDim:{value:0},uLensOn:{value:0},uPx:{value:1},
       uL0:{value:new THREE.Vector3()},uL1:{value:new THREE.Vector3()},uL2:{value:new THREE.Vector3()},uLamp:{value:lampCol}},
-    vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}',
-    fragmentShader:`varying vec2 vUv;uniform sampler2D tScene;uniform vec2 uRes;uniform float uTime,uDefocus,uDim,uLensOn,uPx;uniform vec3 uL0,uL1,uL2,uLamp;
+    vertexShader:QUAD_VS,
+    fragmentShader:`varying vec2 vUv;uniform sampler2D tScene,tBlur;uniform vec2 uRes;uniform float uTime,uDefocus,uDim,uLensOn,uPx;uniform vec3 uL0,uL1,uL2,uLamp;
       float smin(float a,float b,float k){float h=clamp(.5+.5*(b-a)/k,0.,1.);return mix(b,a,h)-k*h*(1.-h);}
       float sdf(vec2 p){float k=uL0.z*.9;float d=length(p-uL0.xy)-uL0.z;d=smin(d,length(p-uL1.xy)-uL1.z,k);d=smin(d,length(p-uL2.xy)-uL2.z,k);return d;}
       float hash(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
-      vec3 soft(vec2 uv,float lod,float r){vec2 o=r/uRes;
-        return (textureLod(tScene,uv+o*vec2(.7,.7),lod).rgb+textureLod(tScene,uv+o*vec2(-.7,.7),lod).rgb
-          +textureLod(tScene,uv+o*vec2(.7,-.7),lod).rgb+textureLod(tScene,uv+o*vec2(-.7,-.7),lod).rgb)*.25;}
       void main(){
-        vec2 px=gl_FragCoord.xy;float lod=uDefocus*4.4;
-        vec3 col=soft(vUv,lod,uDefocus*13.*uPx);
+        vec2 px=gl_FragCoord.xy;
+        /* резкий кадр перетекает в размытый по мере ухода из фокуса */
+        float bw=smoothstep(0.,.8,uDefocus);
+        vec3 col=texture2D(tScene,vUv).rgb;
+        if(bw>.001)col=mix(col,texture2D(tBlur,vUv).rgb,bw);
         if(uLensOn>.003){
           float d=sdf(px);
           if(d<2.5*uPx){
@@ -312,10 +356,11 @@ function init(){
             vec2 n=normalize(vec2(sdf(px+e.xy)-sdf(px-e.xy),sdf(px+e.yx)-sdf(px-e.yx))+1e-6);
             float depth=clamp(-d/(R*.66),0.,1.);float bend=pow(1.-depth,2.3);
             vec2 off=(-n*bend*R*.5-(px-uL0.xy)*.09*depth)*uLensOn;
-            float ll=lod*.5+.35;vec3 g;
-            g.r=textureLod(tScene,(px+off*1.1)/uRes,ll).r;
-            g.g=textureLod(tScene,(px+off)/uRes,ll).g;
-            g.b=textureLod(tScene,(px+off*.9)/uRes,ll).b;
+            vec2 u0=(px+off)/uRes;vec3 g;
+            g.r=texture2D(tScene,(px+off*1.1)/uRes).r;
+            g.g=texture2D(tScene,u0).g;
+            g.b=texture2D(tScene,(px+off*.9)/uRes).b;
+            g=mix(g,texture2D(tBlur,u0).rgb,.14+bw*.7);
             float hl=pow(max(dot(n,normalize(vec2(-.55,.83))),0.),2.4)*pow(bend,1.4);
             float hl2=pow(max(dot(n,normalize(vec2(.55,-.83))),0.),3.)*pow(bend,1.8);
             g*=1.-.3*pow(bend,3.)*(1.-hl);
@@ -326,11 +371,14 @@ function init(){
         col=mix(col,vec3(dot(col,vec3(.3,.59,.11))),uDim*.3);
         col=mix(col,col/(1.+col*3.),uDim);
         col*=mix(1.,.3,uDim);
+        /* в роли фона низ экрана чуть темнее: текст, который въезжает снизу, читается сразу */
+        col*=1.-uDim*.32*smoothstep(.6,0.,vUv.y);
         vec2 q=vUv-.5;col*=1.-dot(q,q)*.5;
         gl_FragColor=vec4(col,1.);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
-        gl_FragColor.rgb+=(hash(px+fract(uTime)*91.7)-.5)*.026;
+        /* зерно против полос на плавных переходах; под текстом оно тише */
+        gl_FragColor.rgb+=(hash(px+fract(uTime)*91.7)-.5)*(.026-.01*uDim);
       }`
   });
   const post=new THREE.Mesh(tri,postMat);post.frustumCulled=false;
@@ -392,10 +440,10 @@ function init(){
   ['pointerup','pointercancel'].forEach(n=>addEventListener(n,e=>{dragging=false;if(e.pointerType!=='mouse')pIn=false},{passive:true}));
   document.addEventListener('mouseleave',()=>{pIn=false});
 
-  function resize(){
+  function resize(force){
     const w=canvas.clientWidth||innerWidth,h=canvas.clientHeight||innerHeight;
     const t=TIERS[tier],nd=Math.min(window.devicePixelRatio||1,t.dpr);
-    if(w===W&&Math.abs(h-H)<2&&nd===dpr&&rt)return;
+    if(!force&&w===W&&Math.abs(h-H)<2&&nd===dpr&&rt)return;
     W=w;H=h;dpr=nd;
     renderer.setPixelRatio(dpr);renderer.setSize(W,H,false);
     camera.aspect=W/H;
@@ -409,7 +457,7 @@ function init(){
     if(t.shadow){lamp.shadow.mapSize.set(t.shadow,t.shadow);if(lamp.shadow.map){lamp.shadow.map.dispose();lamp.shadow.map=null}}
     renderer.shadowMap.needsUpdate=true;
     Object.values(M).forEach(m=>{if(m)m.needsUpdate=true});
-    rt=null;resize();
+    resize(true);
   }
 
   function update(dt){
@@ -507,6 +555,7 @@ function init(){
     if(fr.focus<.04&&!first){skip=!skip;if(skip){time+=dt;return}}
     update(skip?dt*2:dt);
     renderer.setRenderTarget(rt);renderer.render(scene,camera);
+    if(postMat.uniforms.uDefocus.value>.004||postMat.uniforms.uLensOn.value>.003)runBlur();
     renderer.setRenderTarget(null);renderer.render(postScene,postCam);
     if(first){
       first=false;root.classList.add('has-gl');

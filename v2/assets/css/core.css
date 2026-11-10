@@ -226,8 +226,8 @@ em.lit{font-style:normal;color:transparent;background:linear-gradient(100deg,rgb
 
 /* панель «свет сайта» */
 .lightpop{position:fixed;z-index:60;top:84px;right:max(var(--gut),calc((100vw - var(--wrap))/2));width:min(340px,calc(100vw - 24px));padding:20px 20px 18px;border-radius:var(--r-l);
-  opacity:0;transform:translateY(-8px) scale(.97);transform-origin:top right;pointer-events:none;transition:opacity .25s ease,transform .45s var(--spring);--blur:30px}
-.lightpop.on{opacity:1;transform:none;pointer-events:auto}
+  opacity:0;visibility:hidden;transform:translateY(-8px) scale(.97);transform-origin:top right;pointer-events:none;transition:opacity .25s ease,transform .45s var(--spring),visibility 0s linear .3s;--blur:30px}
+.lightpop.on{opacity:1;visibility:visible;transform:none;pointer-events:auto;transition-delay:0s}
 .lightpop h4{font-family:var(--f-disp);font-weight:400;font-size:15px;letter-spacing:-.01em;margin-bottom:6px}
 .lightpop p{font-size:13px;line-height:1.5;color:var(--ink-3)}
 .kval{display:flex;align-items:baseline;gap:8px;margin:16px 0 10px;font-family:var(--f-disp);font-weight:300;font-size:34px;letter-spacing:-.04em;line-height:1}
@@ -271,19 +271,23 @@ em.lit{font-style:normal;color:transparent;background:linear-gradient(100deg,rgb
     transform:translateX(calc(var(--i,0)*100%));transition:transform .55s var(--spring),opacity .3s ease}
   .dock-bubble.off{opacity:0}
   .sheet{display:block;position:fixed;z-index:54;left:10px;right:10px;max-width:520px;margin:0 auto;bottom:calc(var(--dock-h) + 6px + env(safe-area-inset-bottom,0px));
-    padding:10px;border-radius:30px;opacity:0;transform:translateY(16px) scale(.96);transform-origin:bottom center;pointer-events:none;
-    transition:opacity .25s ease,transform .5s var(--spring);--blur:30px;background:linear-gradient(180deg,rgba(40,46,58,.6),rgba(12,15,22,.72))}
-  .sheet.on{opacity:1;transform:none;pointer-events:auto}
+    padding:10px;border-radius:30px;opacity:0;visibility:hidden;transform:translateY(16px) scale(.96);transform-origin:bottom center;pointer-events:none;
+    transition:opacity .25s ease,transform .5s var(--spring),visibility 0s linear .3s;--blur:30px;background:linear-gradient(180deg,rgba(40,46,58,.6),rgba(12,15,22,.72))}
+  .sheet.on{opacity:1;visibility:visible;transform:none;pointer-events:auto;transition-delay:0s}
   .sheet a{display:grid;grid-template-columns:auto 1fr;gap:2px 14px;align-items:center;padding:13px 14px;border-radius:20px;text-decoration:none;color:var(--ink);transition:background .2s ease}
   .sheet a:active,.sheet a:hover{background:rgba(255,255,255,.08)}
   .sheet a i{grid-row:1/3;width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-style:normal;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;
     color:rgb(var(--lamp));background:rgb(var(--lamp)/.1);border:1px solid rgb(var(--lamp)/.28)}
   .sheet a b{font-family:var(--f-disp);font-weight:400;font-size:14.5px;letter-spacing:-.01em}
   .sheet a span{font-size:12.5px;color:var(--ink-3);line-height:1.35}
+  .sheet-set{display:flex;gap:8px;margin-top:6px;padding:10px 4px 2px;border-top:1px solid var(--line-3)}
+  .sheet-set .tool{flex:1;height:46px;text-transform:uppercase}
   .scrim{position:fixed;inset:0;z-index:53;background:rgba(3,5,8,.5);opacity:0;pointer-events:none;transition:opacity .3s ease}
   .scrim.on{opacity:1;pointer-events:auto}
 }
 @media (max-width:380px){.dock a,.dock button{font-size:9.5px}.brand b{font-size:12.5px}}
+/* узкий ноутбук: имя в шапке прячется, остаётся знак */
+@media (min-width:1100px) and (max-width:1250px){.nav .brand b{display:none}.nav-links a{padding:0 11px}}
 
 /* ============ шаги ============ */
 .steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:0;counter-reset:st}

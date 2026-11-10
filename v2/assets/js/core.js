@@ -52,10 +52,11 @@ function paintLight(){
   root.style.setProperty('--lamp-2',c2.join(' '));
   each($$('[data-kval]'),function(el){el.textContent=K});
   each($$('[data-krange]'),function(el){if(+el.value!==K)el.value=K});
-  each($$('[data-k]'),function(el){el.setAttribute('aria-pressed',String(+el.getAttribute('data-k')===K))});
+  each($$('[data-kelvin]'),function(el){el.setAttribute('aria-pressed',String(+el.getAttribute('data-kelvin')===K))});
   try{window.dispatchEvent(new CustomEvent('vt:light',{detail:{k:K,rgb:c,rgb2:c2}}))}catch(e){}
 }
 function setK(k,quiet){
+  k=+k;if(!isFinite(k))return;
   k=Math.max(KMIN,Math.min(KMAX,Math.round(k/100)*100));
   if(k===K)return;
   K=k;lsSet('vt_k',String(K));paintLight();
@@ -69,8 +70,9 @@ doc.addEventListener('input',function(e){
   if(t&&t.hasAttribute&&t.hasAttribute('data-krange'))setK(+t.value);
 });
 doc.addEventListener('click',function(e){
-  var b=e.target.closest&&e.target.closest('[data-k]');
-  if(b){setK(+b.getAttribute('data-k'),true);Snd.play('on')}
+  /* пресеты света: атрибут data-kelvin (data-k занят ячейками рулетки) */
+  var b=e.target.closest&&e.target.closest('[data-kelvin]');
+  if(b){setK(+b.getAttribute('data-kelvin'),true);Snd.play('on')}
 });
 
 /* выпадающая панель «свет сайта» */
@@ -280,7 +282,7 @@ doc.addEventListener('click',function(e){
   var t=e.target.closest&&e.target.closest(SNDSEL);
   if(!t)return;
   var s=t.getAttribute('data-snd');
-  if(s==='none'||t.hasAttribute('data-sound')||t.hasAttribute('data-k'))return;
+  if(s==='none'||t.hasAttribute('data-sound')||t.hasAttribute('data-kelvin'))return;
   Snd.play(s||'tap');
 });
 doc.addEventListener('toggle',function(e){

@@ -67,7 +67,7 @@
   <span class="lab dot">свет сайта</span>
   <div class="kval"><span data-kval>3000</span><small>кельвин</small></div>
   <input class="krange" type="range" min="2700" max="6500" step="100" value="3000" data-krange aria-label="Температура света, кельвины">
-  <div class="kpre"><button type="button" data-k="2700">тёплый</button><button type="button" data-k="4000">нейтральный</button><button type="button" data-k="6500">холодный</button></div>
+  <div class="kpre"><button type="button" data-kelvin="2700">тёплый</button><button type="button" data-kelvin="4000">нейтральный</button><button type="button" data-kelvin="6500">холодный</button></div>
   <p style="margin-top:14px">Один и тот же интерьер под тёплой и холодной лампой выглядит по-разному. Сайт — тоже.</p>
 </div>
 <main id="main">
@@ -170,6 +170,10 @@
   <a href="ruletka.html"><i>01</i><b>Рулетка интерьера</b><span>Стиль, палитра и свет под ваш объект</span></a>
   <a href="palitra.html"><i>02</i><b>Палитра и свет</b><span>Цвета с пропорциями под тёплой и нейтральной лампой</span></a>
   <a href="priemka.html"><i>03</i><b>Чек-лист приёмки</b><span>Осмотр квартиры по пунктам и список замечаний для акта</span></a>
+  <div class="sheet-set">
+    <button type="button" class="tool" data-light-open data-snd="none" aria-label="Свет сайта: температура"><i class="bulb"></i><span>свет <span data-kval>3000</span> K</span></button>
+    <button type="button" class="tool" data-sound aria-pressed="false" aria-label="Звук"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span data-sound-text data-on="звук вкл" data-off="звук выкл">звук выкл</span></button>
+  </div>
 </div>
 <nav class="dock glass" aria-label="Быстрая навигация" data-liquid="18" data-liquid-k="34" data-liquid-blur="8">
   <span class="dock-bubble" aria-hidden="true"></span>

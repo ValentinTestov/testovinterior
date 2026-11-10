@@ -363,6 +363,9 @@ em.lit{font-style:normal;color:transparent;background:linear-gradient(100deg,rgb
 .foot nav a:hover,.foot .fcol a:hover{color:rgb(var(--lamp))}
 .foot .cp{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;border-top:1px solid var(--line-3);padding-top:20px;
   font-family:var(--f-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+/* неброский переход на прежнюю версию сайта: тише остального подвала, проявляется при наведении */
+.foot .cp .oldv{color:var(--ink-4);text-decoration:none;border-bottom:1px solid transparent;transition:color .2s ease,border-color .2s ease}
+.foot .cp .oldv:hover,.foot .cp .oldv:focus-visible{color:var(--ink-2);border-bottom-color:var(--line-2)}
 
 /* ============ плашка cookie ============ */
 .ck{position:fixed;z-index:65;left:12px;right:12px;bottom:calc(var(--dock-h) + 14px + env(safe-area-inset-bottom,0px));max-width:720px;margin:0 auto;
@@ -406,7 +409,7 @@ em.lit{font-style:normal;color:transparent;background:linear-gradient(100deg,rgb
 .js [data-rv]{opacity:0;transform:translate3d(0,26px,0);filter:blur(10px);transition:opacity .9s var(--ease),transform 1.1s var(--ease),filter .9s var(--ease);transition-delay:calc(var(--d,0)*90ms)}
 .js [data-rv].in{opacity:1;transform:none;filter:none}
 /* переход между страницами (где браузер умеет) */
-@view-transition{navigation:auto}
+@media (prefers-reduced-motion:no-preference){@view-transition{navigation:auto}}
 ::view-transition-old(root){animation:vt-out .28s ease both}
 ::view-transition-new(root){animation:vt-in .5s var(--ease) both}
 @keyframes vt-out{to{opacity:0;filter:blur(8px)}}

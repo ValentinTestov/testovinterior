@@ -324,7 +324,8 @@ function init(){
           }
         }
         col=mix(col,vec3(dot(col,vec3(.3,.59,.11))),uDim*.3);
-        col*=mix(1.,.2,uDim);
+        col=mix(col,col/(1.+col*3.),uDim);
+        col*=mix(1.,.3,uDim);
         vec2 q=vUv-.5;col*=1.-dot(q,q)*.5;
         gl_FragColor=vec4(col,1.);
         #include <tonemapping_fragment>
@@ -526,7 +527,7 @@ function init(){
     palette:()=>palIdx,
     setPalette:i=>palSet(i,false),
     setStage:n=>{if(ST[n])procStage=n},
-    start:()=>{held=false},
+    start:()=>{held=false;if(reduce)Object.assign(cur,ST.viz)},
     held:()=>held,
     /* для снимка-заглушки и отладки */
     debug:()=>({tier,dpr,W,H,focus:fr.focus,build:cur.build})

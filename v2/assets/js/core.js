@@ -252,6 +252,10 @@ var Snd=(function(){
   }
   doc.addEventListener('pointerdown',unlock,{passive:true});
   doc.addEventListener('keydown',unlock);
+  /* iOS разрешает звук только по отпусканию пальца или клику — «будим» контекст и на них */
+  function wake(){if(on&&ctx&&ctx.state==='suspended'){try{ctx.resume()}catch(e){}}}
+  doc.addEventListener('touchend',wake,{passive:true});
+  doc.addEventListener('click',wake,true);
   doc.addEventListener('visibilitychange',function(){
     if(!ctx)return;
     try{if(doc.hidden)ctx.suspend();else if(on)ctx.resume()}catch(e){}
@@ -372,7 +376,13 @@ var rv=$$('[data-rv]');
 if(rv.length){
   if('IntersectionObserver' in window&&!reduce){
     var io=new IntersectionObserver(function(es){
-      es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target)}});
+      es.forEach(function(en){
+        if(!en.isIntersecting)return;
+        var el=en.target;
+        el.classList.add('in');io.unobserve(el);
+        /* когда блок проявился, снимаем метку: дальше у него свои переходы (наклон карточек и т.п.) */
+        setTimeout(function(){el.removeAttribute('data-rv')},1700);
+      });
     },{rootMargin:'0px 0px -8% 0px',threshold:.08});
     each(rv,function(el){io.observe(el)});
     /* страховка: если наблюдатель не сработал (печать, скриншот всей страницы) */

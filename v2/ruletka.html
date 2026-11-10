@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#05070B">
+<title>Рулетка интерьера — Valentin Testov</title>
+<meta name="description" content="Выберите объект и получите интерьерное направление: стиль, палитру, освещение и ключевые решения.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2305070B'/%3E%3Cpath d='M6.5 8 16 25.5 25.5 8M11.5 8h9M16 8v10.5' fill='none' stroke='%23FFBE80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:title" content="Рулетка интерьера — Valentin Testov">
+<meta property="og:description" content="Выберите объект и получите интерьерное направление: стиль, цвета, освещение и ключевые решения.">
+<meta property="og:site_name" content="Valentin Testov">
+<meta property="og:url" content="https://valentintestov.github.io/testovinterior/v2/ruletka.html">
+<meta property="og:image" content="https://valentintestov.github.io/testovinterior/v2/assets/og/ruletka.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script>document.documentElement.className+=' js'</script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preload" href="assets/fonts/unbounded-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/core.css">
+<link rel="stylesheet" href="assets/css/tools.css">
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    /* отказ от cookie (плашка внизу, assets/js/core.js) — счётчик не грузим */
+    var ckOff=false;try{ckOff=localStorage.getItem('ck')==='no'}catch(x){}
+    if(!ckOff){
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=112145522', 'ym');
+
+    ym(112145522, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    }
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/112145522" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+</head>
+<body data-sound-default>
+<a class="skip" href="#main">К содержимому</a>
+<div class="amb" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="grid"></i><i class="grain"></i></div>
+<header class="nav">
+  <div class="nav-in glass" data-liquid="20" data-liquid-k="38" data-liquid-blur="7">
+    <a class="brand" href="index.html" aria-label="Valentin Testov — на главную"><svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 6.5 16 27 27.5 6.5"/><path d="M10.5 6.5h11M16 6.5v12.5"/></svg><b>Valentin Testov</b></a>
+    <nav class="nav-links" aria-label="Основное меню">
+      <a href="index.html">Главная</a>
+      <a href="portfolio.html">Портфолио</a>
+      <a href="ruletka.html" aria-current="page">Рулетка</a>
+      <a href="palitra.html">Палитра</a>
+      <a href="priemka.html">Приёмка</a>
+      <a href="services.html">Услуги и цены</a>
+    </nav>
+    <div class="nav-tools">
+      <button type="button" class="tool" id="lightBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="lightPop" aria-label="Свет сайта: температура" data-snd="none"><i class="bulb"></i><span><span data-kval>3000</span> K</span></button>
+      <button type="button" class="tool" data-sound aria-pressed="false" aria-label="Звук"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
+      <a class="btn lamp" href="https://t.me/vtestov" target="_blank" rel="noopener">Написать</a>
+    </div>
+  </div>
+</header>
+<div class="lightpop glass" id="lightPop" role="dialog" aria-label="Свет сайта">
+  <span class="lab dot">свет сайта</span>
+  <div class="kval"><span data-kval>3000</span><small>кельвин</small></div>
+  <input class="krange" type="range" min="2700" max="6500" step="100" value="3000" data-krange aria-label="Температура света, кельвины">
+  <div class="kpre"><button type="button" data-k="2700">тёплый</button><button type="button" data-k="4000">нейтральный</button><button type="button" data-k="6500">холодный</button></div>
+  <p style="margin-top:14px">Один и тот же интерьер под тёплой и холодной лампой выглядит по-разному. Сайт — тоже.</p>
+</div>
+<main id="main">
+<div class="wrap narrow page">
+
+  <header class="phead" data-rv>
+    <p class="lab dot">valentin testov · интерьерный генератор</p>
+    <h1>Рулетка<br><em class="lit">интерьера</em></h1>
+    <p class="lede">Не знаете, с какого интерьера начать? Выберите своё пространство и получите интерьерное направление: стиль, цвета, освещение и несколько решений для планировки и атмосферы. Понравившуюся идею можно сохранить и использовать как отправную точку для будущего проекта.</p>
+  </header>
+
+  <ol class="steps three glass block" data-rv>
+    <li><span class="num">01</span> Выберите объект — квартиру, дом или коммерческое помещение.</li>
+    <li><span class="num">02</span> Запустите рулетку и получите готовое направление.</li>
+    <li><span class="num">03</span> Сохраните идею или зафиксируйте то, что понравилось, и докрутите остальное.</li>
+  </ol>
+
+  <section class="pick glass block sm" data-rv>
+    <div class="plab">Ваш объект</div>
+    <div class="seg" id="grp" role="group" aria-label="Тип помещения">
+      <button type="button" data-grp="res" aria-pressed="true">Жильё</button>
+      <button type="button" data-grp="com" aria-pressed="false">Коммерция</button>
+    </div>
+    <div class="chips" id="types" style="margin-top:12px"></div>
+    <div class="plab sub">Примерная площадь — необязательно</div>
+    <div class="chips small" id="areas"></div>
+  </section>
+
+  <div class="rbar">
+    <button type="button" class="pill" id="wild" aria-pressed="false">удиви меня</button>
+    <button type="button" class="pill" id="sound" data-sound aria-pressed="true"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span data-sound-text data-on="звук" data-off="звук выкл">звук</span></button>
+    <span class="count" id="count">идей: 0</span>
+  </div>
+
+  <div class="frame glass">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <button type="button" class="spin" id="spin" disabled data-snd="whoosh"><span class="d">◆</span>&nbsp;&nbsp;получить идею&nbsp;&nbsp;<span class="d">◆</span></button>
+
+  <div class="hintbar"><span id="hint">Выберите объект выше</span></div>
+
+  <div class="icard glass" id="card" aria-live="polite">
+    <div class="rule"></div>
+    <div class="cinner">
+      <div class="chead"><span id="cnum">ваша идея</span><span>valentin testov</span></div>
+      <div id="crows"></div>
+      <div class="cexp">
+        <button type="button" class="ghost" id="png" data-snd="none">сохранить png</button>
+        <button type="button" class="ghost" id="fav">☆ в избранное</button>
+        <button type="button" class="ghost" id="copy">скопировать</button>
+        <a class="ghost gold" id="cardcta" href="#" target="_blank" rel="noopener">обсудить эту концепцию</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="arch">
+    <div class="ahead">
+      <span class="atitle">Сохранённые идеи</span>
+      <span class="astat" id="astat"></span>
+      <span class="amode" id="amode"></span>
+    </div>
+    <div class="atools">
+      <button type="button" class="pill" id="fall" aria-pressed="true">все</button>
+      <button type="button" class="pill" id="ffav" aria-pressed="false">★ избранное</button>
+    </div>
+    <div id="alist" class="glass flat"></div>
+    <button type="button" class="ghost amore" id="amore">показать ещё</button>
+
+    <details class="extra">
+      <summary>Дополнительно</summary>
+      <div class="extrabox">
+        <button type="button" class="ghost" id="aexport">выгрузить файлом</button>
+        <button type="button" class="ghost" id="aclear">очистить историю</button>
+        <p class="exnote" id="exnote"></p>
+      </div>
+    </details>
+  </section>
+
+</div>
+</main>
+<footer class="foot">
+  <div class="wrap footin">
+    <div class="fb">
+      <a class="brand" href="index.html"><svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 6.5 16 27 27.5 6.5"/><path d="M10.5 6.5h11M16 6.5v12.5"/></svg><b>Valentin Testov</b></a>
+      <p>Дизайн интерьера: планировка, визуализация, подбор материалов и авторский надзор.</p>
+    </div>
+    <nav aria-label="Разделы сайта">
+      <span class="lab">разделы</span>
+      <a href="index.html">Главная</a>
+      <a href="portfolio.html">Портфолио</a>
+      <a href="ruletka.html">Рулетка</a>
+      <a href="palitra.html">Палитра</a>
+      <a href="priemka.html">Приёмка</a>
+      <a href="services.html">Услуги и цены</a>
+    </nav>
+    <div class="fcol">
+      <span class="lab">связаться</span>
+      <a href="https://t.me/vtestov" target="_blank" rel="noopener">t.me/vtestov</a>
+      <a href="pravila.html#usloviya">Условия использования</a>
+      <a href="pravila.html#konfidencialnost">Конфиденциальность</a>
+    </div>
+    <div class="cp"><span>© 2026 Valentin Testov · все права защищены</span><span>свет · стекло · пространство</span></div>
+  </div>
+</footer>
+<div class="scrim" aria-hidden="true"></div>
+<div class="sheet glass" id="toolsSheet" aria-hidden="true">
+  <a href="ruletka.html"><i>01</i><b>Рулетка интерьера</b><span>Стиль, палитра и свет под ваш объект</span></a>
+  <a href="palitra.html"><i>02</i><b>Палитра и свет</b><span>Цвета с пропорциями под тёплой и нейтральной лампой</span></a>
+  <a href="priemka.html"><i>03</i><b>Чек-лист приёмки</b><span>Осмотр квартиры по пунктам и список замечаний для акта</span></a>
+</div>
+<nav class="dock glass" aria-label="Быстрая навигация" data-liquid="18" data-liquid-k="34" data-liquid-blur="8">
+  <span class="dock-bubble" aria-hidden="true"></span>
+  <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11.2 12 4l8 7.2V20h-5.4v-5.2H9.4V20H4z"/></svg><span>Главная</span></a>
+  <a href="portfolio.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span>Работы</span></a>
+  <button type="button" id="dockTools" aria-expanded="false" aria-controls="toolsSheet" data-snd="none" data-current><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h8.6M17.4 7H20M4 17h2.6M11.4 17H20"/><circle cx="15" cy="7" r="2.4"/><circle cx="9" cy="17" r="2.4"/></svg><span>Инструменты</span></button>
+  <a href="services.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 20V4h5a4.5 4.5 0 0 1 0 9H6M6 16.5h7.5"/></svg><span>Цены</span></a>
+  <a class="dcta" href="https://t.me/vtestov" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 3.5 10.6 13.4M20.5 3.5l-6 17-3.9-7.1-7.1-3.9z"/></svg><span>Написать</span></a>
+</nav>
+<div class="modal" id="cta" role="dialog" aria-modal="true" aria-labelledby="ctatitle" hidden>
+  <div class="mbox glass">
+    <button type="button" class="mx" id="ctax" aria-label="Закрыть">✕</button>
+    <div class="mtitle" id="ctatitle">Понравилась одна из идей?</div>
+    <p class="mtext">Сохраните карточку и пришлите её мне. Разберём, что именно вам понравилось, и превратим это направление в интерьер уже под ваше помещение.</p>
+    <a class="btn lamp mgo" id="ctago" href="#" target="_blank" rel="noopener">Обсудить эту идею</a>
+    <button type="button" class="mless" id="ctano">Продолжить крутить</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/card.js"></script>
+<script src="assets/js/ruletka.js"></script>
+</body>
+</html>

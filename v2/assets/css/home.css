@@ -163,7 +163,7 @@
 .pack.pick{background:linear-gradient(180deg,rgb(var(--lamp)/.13),rgb(var(--lamp)/.03))}
 .pack.pick .pr{color:rgb(var(--lamp))}
 .packs-foot{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center;justify-content:space-between;margin-top:22px}
-.packs-foot p{max-width:64ch;flex:1 1 320px}
+.packs-foot p{max-width:64ch;flex:1 1 320px;color:var(--ink-2)}
 
 /* ============ адаптив ============ */
 @media (max-width:1099px){

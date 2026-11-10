@@ -348,6 +348,11 @@ em.lit{font-style:normal;color:transparent;background:linear-gradient(100deg,rgb
 
 /* ============ подвал ============ */
 .foot{position:relative;z-index:2;margin-top:clamp(40px,6vw,80px);border-top:1px solid var(--line-3);flex-shrink:0}
+/* затемнение снизу вверх — от самого края страницы до конца разделов: подвал читается над любой картинкой.
+   Начинается в отступе над подвалом (содержимое не задевает) и уходит под док на телефоне. */
+.foot::before{content:"";position:absolute;z-index:-1;left:0;right:0;pointer-events:none;
+  top:calc(-1*clamp(40px,6vw,80px));bottom:calc(-1*(var(--dock-h) + env(safe-area-inset-bottom,0px)));
+  background:linear-gradient(180deg,rgba(5,7,11,0) 0%,rgba(5,7,11,.46) 22%,rgba(5,7,11,.78) 55%,rgba(5,7,11,.95) 100%)}
 .footin{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:28px 40px;padding-top:clamp(34px,5vw,56px);padding-bottom:clamp(30px,4vw,44px)}
 .foot .fb{display:grid;gap:14px;align-content:start}
 .foot .fb .brand b{font-size:15px}
@@ -357,7 +362,7 @@ em.lit{font-style:normal;color:transparent;background:linear-gradient(100deg,rgb
 .foot nav a,.foot .fcol a{font-size:14px;color:var(--ink-2);text-decoration:none;width:fit-content;transition:color .2s ease}
 .foot nav a:hover,.foot .fcol a:hover{color:rgb(var(--lamp))}
 .foot .cp{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;border-top:1px solid var(--line-3);padding-top:20px;
-  font-family:var(--f-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-4)}
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
 
 /* ============ плашка cookie ============ */
 .ck{position:fixed;z-index:65;left:12px;right:12px;bottom:calc(var(--dock-h) + 14px + env(safe-area-inset-bottom,0px));max-width:720px;margin:0 auto;

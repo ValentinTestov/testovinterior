@@ -555,6 +555,11 @@ VT.cookieShow=function(){if(ckGet()===null)ckShow()};
 /* на главной плашку показывает home.js — после заставки */
 if(!body.hasAttribute('data-intro'))VT.cookieShow();
 
+/* переход на прежнюю версию сайта (ссылка в подвале): в этот визит старый сайт
+   не будет звать обратно плашкой «новая версия» — человек ушёл туда сам */
+var oldv=$('[data-oldv]');
+if(oldv)oldv.addEventListener('click',function(){try{sessionStorage.setItem('vt_v2promo','off')}catch(e){}});
+
 /* «изменить выбор» на странице правил */
 var ckReset=doc.getElementById('ckreset');
 if(ckReset){

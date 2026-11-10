@@ -282,3 +282,58 @@ p{line-height:1.65}
   .ck{transition:none}
   .work,.btn{transition:none}
 }
+
+/* ============ приглашение в новую версию сайта (v2) ============
+   Нарочно оформлено не как этот сайт, а как новый: дымчатое стекло, свет лампы,
+   шрифт Unbounded (берётся из v2). Разметку вставляет assets/site.js. */
+@font-face{font-family:'VT2 Display';font-style:normal;font-weight:200 900;font-display:swap;
+  src:url(../v2/assets/fonts/unbounded-cyrillic-wght-normal.woff2) format('woff2')}
+.v2p{position:relative;isolation:isolate;overflow:hidden;width:calc(100% - 28px);max-width:1028px;margin:14px auto 0;
+  display:flex;align-items:center;gap:12px 18px;padding:14px 14px 14px 18px;border-radius:26px;
+  color:#F3F6FB;border:1px solid rgba(255,255,255,.14);
+  background:linear-gradient(135deg,rgba(255,255,255,.10) 0%,rgba(255,255,255,.03) 46%,rgba(255,255,255,.06) 100%),rgba(5,7,11,.74);
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(255,255,255,.04),0 26px 60px -30px rgba(0,0,0,.85),0 0 70px -28px rgba(255,190,128,.55);
+  opacity:0;transform:translateY(-10px) scale(.985);
+  transition:opacity .5s ease,transform .7s cubic-bezier(.34,1.56,.64,1),height .45s cubic-bezier(.2,.8,.2,1),margin .45s cubic-bezier(.2,.8,.2,1),padding .45s cubic-bezier(.2,.8,.2,1)}
+.v2p.on{opacity:1;transform:none}
+.v2p.bye{height:0!important;margin-top:0;padding-top:0;padding-bottom:0;border-width:0;opacity:0;transform:scale(.97)}
+/* световая кромка: белая сверху слева, цветом лампы снизу справа */
+.v2p::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.6) 0%,rgba(255,255,255,.06) 28%,rgba(255,255,255,0) 58%,rgba(255,190,128,.6) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.v2g{position:absolute;z-index:-1;border-radius:50%;filter:blur(36px);pointer-events:none}
+.v2g.a{right:-30px;top:-110px;width:320px;height:230px;background:rgba(255,190,128,.5)}
+.v2g.b{left:-70px;bottom:-130px;width:300px;height:210px;background:rgba(128,186,255,.34)}
+.v2m{flex:none;width:44px;height:44px;border-radius:15px;display:grid;place-items:center;color:#FFBE80;
+  background:rgba(255,190,128,.10);border:1px solid rgba(255,190,128,.3)}
+.v2m svg{width:25px;height:25px;filter:drop-shadow(0 0 8px rgba(255,190,128,.65))}
+.v2t{flex:1;min-width:0;display:grid;gap:4px}
+.v2t b{font-family:'VT2 Display',var(--disp);font-weight:400;font-size:15.5px;letter-spacing:-.015em;line-height:1.2;color:#F3F6FB}
+.v2t span{font-size:13px;line-height:1.45;color:#BCC5D3}
+.v2b{flex:none;display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:46px;padding:0 22px;border-radius:999px;
+  text-decoration:none;white-space:nowrap;font-family:var(--util);font-weight:500;font-size:14.5px;letter-spacing:.01em;color:#0B0D12;
+  background:linear-gradient(180deg,#FFD3A6 0%,#FFBE80 46%,#D9995C 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.65),inset 0 -8px 14px -8px rgba(0,0,0,.28),0 0 0 1px rgba(255,190,128,.4),0 14px 36px -10px rgba(255,190,128,.7);
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease}
+.v2b:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 0 0 1px rgba(255,190,128,.6),0 18px 46px -8px rgba(255,190,128,.9)}
+.v2b:active{transform:scale(.96)}
+.v2b:focus-visible,.v2x:focus-visible{outline:2px solid #FFBE80;outline-offset:3px}
+.v2b svg{width:17px;height:17px;flex:none}
+.v2x{flex:none;width:38px;height:38px;border-radius:50%;cursor:pointer;display:grid;place-items:center;font-size:13px;line-height:1;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#BCC5D3;transition:color .2s ease,border-color .2s ease,background .2s ease}
+.v2x:hover{color:#fff;border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.1)}
+/* постоянная ссылка на новую версию в подвале */
+.fcontact .flegal a.v2l{color:var(--brass);border-bottom-color:var(--line)}
+.fcontact .flegal a.v2l:hover{color:var(--brass-hi);border-bottom-color:var(--brass)}
+@media (max-width:640px){
+  .v2p{flex-wrap:wrap;width:calc(100% - 20px);margin-top:10px;padding:14px;border-radius:24px}
+  .v2t{flex:1 1 0}
+  .v2x{order:2}
+  .v2b{order:3;flex:1 1 100%}
+}
+@media (prefers-reduced-motion:reduce){.v2p{transition:none}}
+@media print{.v2p{display:none!important}}
+/* плавный переход между страницами нужен только при смене версии сайта (сюда из v2 и обратно);
+   переходы внутри этой версии отменяет assets/site.js — они остаются мгновенными, как были */
+@media (prefers-reduced-motion:no-preference){@view-transition{navigation:auto}}

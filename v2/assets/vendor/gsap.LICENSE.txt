@@ -1,0 +1,10 @@
+GSAP 3.15.1 — GreenSock Animation Platform
+https://gsap.com · https://github.com/greensock/GSAP
+
+Copyright 2008–2026, GreenSock. All rights reserved.
+Subject to the terms of the standard "no charge" license:
+https://gsap.com/standard-license
+
+Files in this folder, unmodified, from the npm package gsap@3.15.1 (/dist):
+gsap.min.js, ScrollTrigger.min.js, DrawSVGPlugin.min.js, SplitText.min.js,
+Draggable.min.js, InertiaPlugin.min.js, Physics2DPlugin.min.js

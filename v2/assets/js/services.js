@@ -1,5 +1,6 @@
 /* ============================================================
    Услуги и цены: калькулятор чертежей по отдельности
+   и живой план — у каждого отмеченного чертежа свой слой на схеме квартиры.
    ============================================================ */
 (function(){
 "use strict";
@@ -126,21 +127,108 @@ function text(c){
   return out.join('\n').replace(/ /g,' ');
 }
 
+/* ============ движение (GSAP) ============
+   Есть VT.motion.ok — суммы перекатываются, слои плана прорисовываются линиями.
+   Нет — всё то же самое появляется сразу. */
+var G=window.gsap,MO=!!(window.VT&&VT.motion&&VT.motion.ok&&G),DRAW=MO&&!!window.DrawSVGPlugin;
+
+/* сумма не прыгает, а перекатывается от прежнего значения к новому.
+   key — что это за число; els — все места, где оно показано. */
+var disp={},rolls={};
+function roll(key,els,to,suffix,unit){
+  els=els.filter(Boolean);
+  var d=disp[key],from=d&&d.unit===unit?d.v:0;
+  if(rolls[key]){rolls[key].kill();rolls[key]=null}
+  disp[key]=d={v:from,unit:unit};
+  function paint(){els.forEach(function(e){e.textContent=fmt(d.v)+suffix})}
+  if(!MO||from===to||!els.length){d.v=to;return}
+  paint();
+  rolls[key]=G.to(d,{v:to,duration:.65,ease:'power2.out',onUpdate:paint,onComplete:function(){d.v=to;paint();rolls[key]=null}});
+}
+
+/* ============ живой план ============ */
+var planBox=document.getElementById('aplan'),planN=document.getElementById('apN'),planNow=document.getElementById('apNow'),
+    LAYERS={},planOn={},planDirty={},nowT=0,NOW0=planNow?planNow.textContent:'';
+if(planBox)each(planBox.querySelectorAll('.pl[data-l]'),function(g){LAYERS[g.getAttribute('data-l')]=g});
+function planSeen(){
+  var r=planBox.getBoundingClientRect();
+  return r.bottom>60&&r.top<(window.innerHeight||0)-60;
+}
+function drawLayer(g,delay){
+  if(!DRAW)return;
+  var lines=g.querySelectorAll('path:not(.nf),rect:not(.nf),circle:not(.nf),ellipse:not(.nf),line:not(.nf)'),fills=g.querySelectorAll('.nf');
+  if(lines.length)G.killTweensOf(lines);
+  if(fills.length)G.killTweensOf(fills);
+  g.classList.add('fresh');
+  clearTimeout(g._fresh);g._fresh=setTimeout(function(){g.classList.remove('fresh')},(delay||0)*1000+1500);
+  /* пунктир на время прорисовки становится сплошной линией; в конце возвращаем как было */
+  if(lines.length)G.fromTo(lines,{drawSVG:'0%'},{drawSVG:'100%',duration:.9,delay:delay||0,ease:'power2.out',stagger:{amount:Math.min(.7,lines.length*.05)},
+    clearProps:'strokeDasharray,strokeDashoffset'});
+  if(fills.length)G.fromTo(fills,{opacity:0},{opacity:1,duration:.5,delay:(delay||0)+.25,stagger:.04,clearProps:'opacity'});
+}
+function planSay(t,hot){
+  if(!planNow)return;
+  planNow.textContent=t;planNow.classList.toggle('hot',!!hot);
+  clearTimeout(nowT);
+  if(hot)nowT=setTimeout(function(){planNow.classList.remove('hot')},1600);
+}
+function planSync(quiet){
+  if(!planBox)return;
+  var n=0,seen=planSeen(),last=null;
+  ITEMS.forEach(function(i){
+    var g=LAYERS[i.id],on=i.inp.checked;
+    if(on)n++;
+    if(!g||!!planOn[i.id]===on)return;
+    planOn[i.id]=on;g.classList.toggle('on',on);
+    if(on){
+      last=i;
+      if(quiet)return;
+      if(seen)drawLayer(g,0);else planDirty[i.id]=1;     /* план не на экране — дорисуем, когда до него долистают */
+    }else{
+      delete planDirty[i.id];
+      if(!last)last={off:i};
+    }
+  });
+  planBox.classList.toggle('walls',!!planOn.obmer);
+  if(planN)planN.textContent=n;
+  if(quiet)return;
+  if(last&&last.off)planSay(n?'убрано: '+low(last.off.name):NOW0,false);
+  else if(last)planSay('+ '+low(last.name),true);
+  else if(!n)planSay(NOW0,false);
+}
+/* телефон: план стоит под списком. Долистали — отмеченные слои прорисовываются по очереди. */
+if(planBox&&MO&&window.ScrollTrigger){
+  ScrollTrigger.create({trigger:planBox,start:'top 78%',end:'bottom 12%',onToggle:function(self){
+    if(!self.isActive)return;
+    var k=0;
+    ITEMS.forEach(function(i){if(planDirty[i.id]&&planOn[i.id]){drawLayer(LAYERS[i.id],k*.3);k++}});
+    planDirty={};
+  }});
+}
+
 /* ============ отрисовка ============ */
 var body=document.getElementById('asBody'),acts=document.getElementById('aActs'),
     bar=document.getElementById('abar'),live=document.getElementById('aLive'),
-    tg=document.getElementById('aTg'),TG_URL=tg.getAttribute('href');
+    tg=document.getElementById('aTg'),TG_URL=tg.getAttribute('href'),first=true;
 
 function render(){
   var c=calc(),a=c.a,h;
   ITEMS.forEach(function(i){
     i.row.classList.toggle('on',i.inp.checked);
-    i.amt.textContent=a?fmt(i.price*a)+NB+'₽':'';
+    var to=a?i.price*a:0,from=i.shown||0;
+    i.shown=to;
+    if(!to){if(i.amt._vtNum)i.amt._vtNum.kill();i.amt.textContent='';i.now=0}
+    else if(MO&&!first&&from&&from!==to){
+      /* площадь изменилась — суммы в строках перекатываются */
+      VT.motion.num(i.amt,i.now||from,to,{dur:.5,fmt:function(v){i.now=v;return fmt(v)+NB+'₽'}});
+    }else{if(i.amt._vtNum)i.amt._vtNum.kill();i.amt.textContent=fmt(to)+NB+'₽';i.now=to}
   });
+  planSync(first);first=false;
   if(!c.sel.length){
     body.innerHTML='<p class="aempty">Отметьте нужные чертежи — посчитаю сумму для вашей площади и сравню с пакетом.</p>'+cmpHTML();
     acts.hidden=true;bar.hidden=true;live.textContent='';
     tg.setAttribute('href',TG_URL);
+    roll('sep',[],0,'','');roll('pk',[],0,'','');disp={};
     return;
   }
   var u=NB+c.unit;
@@ -159,6 +247,8 @@ function render(){
   bar.innerHTML='<span><b>'+fmt(c.sep)+u+'</b><small>'+poz(c.sel.length)
     +(c.pkg?' · пакет «'+esc(c.pkg.name)+'» — '+fmt(c.pk)+u:'')+'</small></span><span class="go">расчёт ↓</span>';
   live.textContent='Отдельно '+fmt(c.sep)+' '+c.unit+(c.pkg?', пакет «'+c.pkg.name+'» — '+fmt(c.pk)+' '+c.unit:'');
+  roll('sep',[body.querySelector('.abig'),bar.querySelector('b')],c.sep,u,c.unit);
+  if(c.pkg)roll('pk',[body.querySelector('.apkh b')],c.pk,u,c.unit);else{roll('pk',[],0,'','');delete disp.pk}
   tg.setAttribute('href',TG_URL+'?text='+encodeURIComponent(text(c)));
 }
 

@@ -6,7 +6,8 @@
    · слушает свет сайта (vt:light) и гамму (VTScene.setPalette);
    · показывает этапы работы: замер → план → визуализация → развёртка;
    · встаёт в «слоты» разметки ([data-slot]) и уходит в размытый фон между ними;
-   · поверх сцены плавает капля жидкого стекла (постобработка).
+   · поверх сцены плавает капля жидкого стекла (постобработка);
+   · шторка «чертёж — рендер» (VTScene.setSplit): левее линии макет в линиях, правее — готовая комната.
    Отладка: ?q=0 — зафиксировать максимальное качество.
    ============================================================ */
 import * as THREE from '../vendor/three.module.min.js';
@@ -81,19 +82,43 @@ function init(){
 
   /* ---------- материалы ---------- */
   const uBuild={value:0},uEdgeCol={value:new THREE.Color()};
+  /* шторка: x линии раздела в точках кадра (левее — чертёж) и ширина светящейся кромки */
+  const uSplit={value:-1e4},uSplitW={value:8};
   function patch(m){
     m.onBeforeCompile=sh=>{
-      sh.uniforms.uBuild=uBuild;sh.uniforms.uEdgeCol=uEdgeCol;
+      sh.uniforms.uBuild=uBuild;sh.uniforms.uEdgeCol=uEdgeCol;sh.uniforms.uSplit=uSplit;sh.uniforms.uSplitW=uSplitW;
       sh.vertexShader=sh.vertexShader
         .replace('#include <common>','#include <common>\nvarying vec3 vWp;')
         .replace('#include <worldpos_vertex>','#include <worldpos_vertex>\nvWp=(modelMatrix*vec4(transformed,1.0)).xyz;');
       sh.fragmentShader=sh.fragmentShader
-        .replace('#include <common>','#include <common>\nvarying vec3 vWp;\nuniform float uBuild;\nuniform vec3 uEdgeCol;')
-        .replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nfloat vtH=uBuild*3.5-.22;\nif(vWp.y>vtH)discard;')
-        .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=uEdgeCol*smoothstep(.26,0.,vtH-vWp.y)*step(uBuild,.995)*2.4;');
+        .replace('#include <common>','#include <common>\nvarying vec3 vWp;\nuniform float uBuild;\nuniform vec3 uEdgeCol;\nuniform float uSplit;\nuniform float uSplitW;')
+        .replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nfloat vtH=uBuild*3.5-.22;\nif(vWp.y>vtH||gl_FragCoord.x<uSplit)discard;')
+        .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=uEdgeCol*smoothstep(.26,0.,vtH-vWp.y)*step(uBuild,.995)*2.4;\ntotalEmissiveRadiance+=uEdgeCol*smoothstep(uSplitW,0.,gl_FragCoord.x-uSplit)*step(0.,uSplit)*1.5;');
     };
     m.customProgramCacheKey=()=>'vt-build';
     m.polygonOffset=true;m.polygonOffsetFactor=1;m.polygonOffsetUnits=1;
+    return m;
+  }
+  /* то, что светится само (окно, экран, лампа, ореол): левее шторки не рисуется */
+  function patchHide(m){
+    m.onBeforeCompile=sh=>{
+      sh.uniforms.uSplit=uSplit;
+      sh.fragmentShader=sh.fragmentShader
+        .replace('#include <common>','#include <common>\nuniform float uSplit;')
+        .replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nif(gl_FragCoord.x<uSplit)discard;');
+    };
+    m.customProgramCacheKey=()=>'vt-hide';
+    return m;
+  }
+  /* линии чертежа: левее шторки видны в полную силу, какой бы ни был этап */
+  function patchLine(m,a){
+    m.onBeforeCompile=sh=>{
+      sh.uniforms.uSplit=uSplit;sh.uniforms.uLineA={value:a};
+      sh.fragmentShader=sh.fragmentShader
+        .replace('#include <common>','#include <common>\nuniform float uSplit;\nuniform float uLineA;')
+        .replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nif(gl_FragCoord.x<uSplit)diffuseColor.a=max(diffuseColor.a,uLineA);');
+    };
+    m.customProgramCacheKey=()=>'vt-line'+a;
     return m;
   }
   const std=(hex,rough,metal)=>patch(new THREE.MeshStandardMaterial({color:hex,roughness:rough===undefined?.88:rough,metalness:metal||0}));
@@ -121,10 +146,10 @@ function init(){
   palSet(0,true);
 
   /* линии чертежа */
-  const lineShell=new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:1,depthWrite:false});
-  const lineFurn=new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthWrite:false});
+  const lineShell=patchLine(new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:1,depthWrite:false}),1);
+  const lineFurn=patchLine(new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthWrite:false}),.8);
   const dimMat={};
-  ['W','D','H','S'].forEach(k=>{dimMat[k]=new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthWrite:false,depthTest:false})});
+  ['W','D','H','S'].forEach(k=>{dimMat[k]=patchLine(new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthWrite:false,depthTest:false}),k==='S'?0:.9)});
 
   /* ---------- сборка комнаты ---------- */
   const room=new THREE.Group();scene.add(room);
@@ -158,7 +183,7 @@ function init(){
   box(2.06,.05,.06,M.trim,1.6,.85,-2.33);box(2.06,.05,.06,M.trim,1.6,2.2,-2.33);
   box(.05,1.4,.06,M.trim,.625,.85,-2.33);box(.05,1.4,.06,M.trim,2.575,.85,-2.33);box(.04,1.4,.05,M.trim,1.6,.85,-2.33);
   box(2.2,.04,.26,M.trim,1.6,.83,-2.2);
-  const paneMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0});
+  const paneMat=patchHide(new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0}));
   const pane=new THREE.Mesh(new THREE.PlaneGeometry(1.96,1.36),paneMat);pane.position.set(1.6,1.55,-2.36);room.add(pane);
   box(.36,2.34,.07,M.curt,.36,.1,-2.24);box(.36,2.34,.07,M.curt,2.84,.1,-2.24);
   /* диван */
@@ -181,14 +206,14 @@ function init(){
     add(new THREE.TubeGeometry(c,56,.017,8,false),M.acc,0,0,0,{edges:false});
     add(new THREE.SphereGeometry(.25,32,14,0,Math.PI*2,0,Math.PI/2),M.acc2,-1.22,1.8,-.58,{ea:60});
   }
-  const bulbMat=new THREE.MeshBasicMaterial({color:0xffffff});
+  const bulbMat=patchHide(new THREE.MeshBasicMaterial({color:0xffffff}));
   const bulb=new THREE.Mesh(new THREE.SphereGeometry(.075,16,12),bulbMat);bulb.position.set(-1.22,1.83,-.58);room.add(bulb);
   const glowTex=(()=>{
     const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d'),gr=g.createRadialGradient(64,64,0,64,64,64);
     gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.18,'rgba(255,255,255,.55)');gr.addColorStop(.5,'rgba(255,255,255,.12)');gr.addColorStop(1,'rgba(255,255,255,0)');
     g.fillStyle=gr;g.fillRect(0,0,128,128);return new THREE.CanvasTexture(c);
   })();
-  const glowMat=new THREE.SpriteMaterial({map:glowTex,color:0xffffff,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0});
+  const glowMat=patchHide(new THREE.SpriteMaterial({map:glowTex,color:0xffffff,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0}));
   const glow=new THREE.Sprite(glowMat);glow.position.copy(bulb.position);glow.scale.setScalar(1.9);room.add(glow);
   /* комод, полка с вещами, картины */
   box(.42,.5,1.7,M.wood,-2.77,.07,-.2);
@@ -211,7 +236,7 @@ function init(){
   /* рабочее место у окна */
   box(1.5,.04,.62,M.wood,1.6,.72,-1.95);box(.04,.72,.56,M.wood,.88,0,-1.95);box(.04,.72,.56,M.wood,2.32,0,-1.95);
   cyl(.03,.14,M.metal,1.6,.76,-2.1,{edges:false});box(.62,.38,.025,M.metal,1.6,.88,-2.1);
-  const scrMat=new THREE.MeshBasicMaterial({color:0x9fc4ff,transparent:true,opacity:0});
+  const scrMat=patchHide(new THREE.MeshBasicMaterial({color:0x9fc4ff,transparent:true,opacity:0}));
   const scr=new THREE.Mesh(new THREE.PlaneGeometry(.58,.34),scrMat);scr.position.set(1.6,1.07,-2.085);room.add(scr);
   {
     const g=grp(1.62,0,-1.3,.22),p={parent:g};
@@ -424,6 +449,10 @@ function init(){
   const cur=Object.assign({},ST.measure,{build:0,lamp:0});
   const fr={cx:0,cy:0,ppu:60,focus:0,inited:false};
   let mx=0,my=0,pmx=0,pmy=0,pIn=false,dragAz=0,dragV=0,dragging=false,lastX=0,time=0;
+  /* шторка: доля ширины слота главного экрана (0 — выключена) и плавный выход, когда слот ушёл с экрана */
+  const heroSlot=slots.find(s=>s.name==='hero')||null;
+  let splitFrac=0,splitMix=0,splitX=-1e4;
+  const BLUE={dW:1,dD:1,dH:1,area:1};
   const dir=new THREE.Vector3(),v3=new THREE.Vector3();
   /* капля: основная и два «хвоста» */
   const L=[{x:0,y:0,vx:0,vy:0},{x:0,y:0},{x:0,y:0}];let lensR=70;
@@ -434,7 +463,9 @@ function init(){
     if(dragging){const dx=e.clientX-lastX;lastX=e.clientX;dragAz+=dx*.32;dragV=dx*.32}
   },{passive:true});
   slots.forEach(s=>{
-    s.el.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;pmx=e.clientX;pmy=e.clientY;pIn=true;
+    s.el.addEventListener('pointerdown',e=>{
+      if(e.target.closest&&e.target.closest('.curtain-knob'))return;   /* тянут шторку — макет не вращаем */
+      dragging=true;lastX=e.clientX;pmx=e.clientX;pmy=e.clientY;pIn=true;
       const h=document.getElementById('hero');if(h)h.classList.add('dragged')});
   });
   ['pointerup','pointercancel'].forEach(n=>addEventListener(n,e=>{dragging=false;if(e.pointerType!=='mouse')pIn=false},{passive:true}));
@@ -514,6 +545,15 @@ function init(){
     gridMat.uniforms.uOn.value=mix(.45,1,1-cur.build*.6);
     bgMat.uniforms.uTime.value=time;bgMat.uniforms.uC.value.set(fr.cx/W,1-fr.cy/H);bgMat.uniforms.uGlow.value=.5+lit*.8;
 
+    /* шторка: работает, пока на экране слот главного экрана и макет построен */
+    const splitWant=(heroSlot&&best===heroSlot&&!held&&splitFrac>.001)?1:0;
+    splitMix+=(splitWant-splitMix)*k(splitWant?9:4);
+    if(heroSlot&&splitMix>.002){
+      const er=sstep(0,1,splitMix);
+      splitX=mix(heroSlot.r.left-70,heroSlot.r.left+heroSlot.r.width*splitFrac,er);
+      uSplit.value=splitX*dpr;uSplitW.value=8*dpr;
+    }else{splitX=-1e4;uSplit.value=-1e4}
+
     /* капля */
     const lensOn=reduce?0:fr.focus*sstep(.02,.3,cur.build+cur.shell);
     lensR=clamp(Math.min(sw,sh)*.16,44,104);
@@ -533,12 +573,17 @@ function init(){
 
     /* подписи */
     for(const l of labels){
-      const want=(cur[l.key]||0)*fr.focus*(held?0:1);
+      v3.copy(l.pos).project(camera);
+      const x=(v3.x*.5+.5)*W,y=(-v3.y*.5+.5)*H;
+      let want=(cur[l.key]||0)*fr.focus*(held?0:1);
+      /* левее шторки — размеры чертежа, а подпись лампы там не нужна */
+      if(splitMix>.01&&x<splitX-6){
+        if(BLUE[l.key])want=Math.max(want,splitMix*fr.focus);
+        else if(l.key==='klab')want*=1-splitMix;
+      }
       l.o+=(want-l.o)*k(8);
       if(l.o<.02){if(l.el.style.opacity!=='0')l.el.style.opacity='0';continue}
-      v3.copy(l.pos).project(camera);
       if(v3.z>1){l.el.style.opacity='0';continue}
-      const x=(v3.x*.5+.5)*W,y=(-v3.y*.5+.5)*H;
       l.el.style.opacity=l.o.toFixed(2);
       l.el.style.transform='translate3d('+x.toFixed(1)+'px,'+y.toFixed(1)+'px,0) translate(-50%,-50%)';
     }
@@ -576,6 +621,8 @@ function init(){
     palette:()=>palIdx,
     setPalette:i=>palSet(i,false),
     setStage:n=>{if(ST[n])procStage=n},
+    /* шторка «чертёж — рендер»: f — доля ширины слота главного экрана, 0 выключает */
+    setSplit:f=>{splitFrac=clamp(+f||0,0,1)},
     start:()=>{held=false;if(reduce)Object.assign(cur,ST.viz)},
     held:()=>held,
     /* для снимка-заглушки и отладки */

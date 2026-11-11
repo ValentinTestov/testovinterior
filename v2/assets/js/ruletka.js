@@ -345,11 +345,24 @@ function bezier(x1,y1,x2,y2){
   return function(x){var lo=0,hi=1,m,i;for(i=0;i<22;i++){m=(lo+hi)/2;if(cx(m)<x)lo=m;else hi=m}return cy((lo+hi)/2)};
 }
 var EASE=bezier(.1,.55,.3,1.07);
+/* С GSAP (VT.motion.ok) барабан останавливается с отскоком: идёт почти ровно, на доле HIT
+   упирается в стопор, проскакивает на десяток пикселей и пружинит на месте.
+   Скорость в момент удара у обеих частей кривой одна, поэтому рывка нет.
+   Без GSAP остаётся прежний плавный переход на CSS. */
+var G=window.gsap,MO=!!(window.VT&&VT.motion&&VT.motion.ok&&G),HIT=.8;
+function bounceEase(x){
+  if(x<=0)return 0;if(x>=1)return 1;
+  var c=.66,w=3*Math.PI;
+  if(x<HIT){var q=x/HIT;return c*q+(1-c)*(1-Math.pow(1-q,3))}
+  var t=(x-HIT)/(1-HIT);
+  return 1+c*(1-HIT)/(HIT*w)*Math.exp(-4.2*t)*Math.sin(w*t);
+}
+var SPIN=MO?bounceEase:EASE;
 function ticksFor(n,delay,dur){
   if(!ac()||n<2)return;
   var steps=700,k=1,i,x,y;
   for(i=1;i<=steps&&k<n;i++){
-    x=i/steps;y=EASE(x);
+    x=i/steps;y=SPIN(x);
     while(k<n&&y>=k/(n-1)){tick((delay+x*dur)/1000,0.016+0.03*(k/n),2100+Math.random()*700);k++}
   }
 }
@@ -469,11 +482,14 @@ function spinReel(k,finalVal,delay,dur,done){
   var cell=cellEl(k),r=reelEl(k);
   if(!cell||!r){done();return}
   var win=cell.querySelector('.window');
-  function land(){
+  function hit(){
     hap('light');
     cell.classList.remove('spinning');
     cell.classList.add('stopped');
     setTimeout(function(){cell.classList.remove('stopped')},760);
+  }
+  function land(quiet){
+    if(quiet!==true)hit();
     r.style.transition='none';
     r.style.willChange='auto';
     r.style.transform='translate3d(0,0,0)';
@@ -493,6 +509,15 @@ function spinReel(k,finalVal,delay,dur,done){
   void r.offsetHeight;
   cell.classList.add('spinning');
   ticksFor(stop+1,delay,dur);
+  if(MO){
+    /* удар и вспышка — в момент, когда барабан упёрся; потом он ещё пружинит */
+    thunk((delay+dur*HIT)/1000);
+    G.killTweensOf(r);
+    G.fromTo(r,{y:0},{y:-stop*h,duration:dur/1000,delay:delay/1000,ease:bounceEase,force3D:true,
+      onComplete:function(){G.set(r,{clearProps:'transform'});land(true)}});
+    G.delayedCall((delay+dur*HIT)/1000,hit);
+    return;
+  }
   thunk((delay+dur)/1000);
   var guard=null;
   function finish(e){
@@ -536,6 +561,7 @@ function spin(){
       if(left===0){
         busy=false;spinBtn.disabled=false;spinLabel('крутить ещё');
         chime();
+        if(MO&&VT.motion.sparks)VT.motion.sparks(spinBtn,30);     /* идея выпала — из кнопки летят искры света */
         var rec=recFromState();dbAdd(rec);showCard(rec);renderArchive();
         maybeCTA();
       }

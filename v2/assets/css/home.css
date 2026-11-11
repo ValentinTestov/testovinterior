@@ -35,7 +35,7 @@
 .intro-on body{overflow:hidden}
 
 /* ============ первый экран ============ */
-.hero{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;gap:clamp(18px,3vw,34px);
+.hero{position:relative;overflow-x:clip;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;gap:clamp(18px,3vw,34px);
   padding-top:calc(var(--nav-h) + 8px);padding-bottom:clamp(20px,4vw,46px)}
 .hero-in{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:clamp(16px,3vw,48px);align-items:center;flex:1 1 auto}
 .hero-txt{display:grid;gap:clamp(16px,2vw,26px);justify-items:start;position:relative;z-index:2}
@@ -154,6 +154,42 @@
 .proc.auto .pstep[aria-pressed="true"] .bar{opacity:.9;animation:fill var(--dur,3.4s) linear forwards}
 @keyframes fill{to{transform:scaleX(1)}}
 
+/* этапы по прокрутке (home.js + GSAP): блок закреплён, полоска под шагом показывает, сколько до следующего */
+.proc.scrolled .pstep[aria-pressed="true"] .bar{opacity:.9;animation:none;transform:scaleX(var(--p,0))}
+
+/* ============ шторка «чертёж — рендер» ============ */
+.curtain{position:absolute;left:0;top:0;bottom:0;width:0;z-index:3;opacity:0;pointer-events:none;transition:opacity .8s ease}
+.curtain.on{opacity:1}
+.no-gl .curtain{display:none}
+/* сама перегородка: тонкая светящаяся кромка стекла */
+.curtain::before{content:"";position:absolute;left:-.5px;top:3%;bottom:9%;width:1px;
+  background:linear-gradient(180deg,transparent,rgb(var(--lamp)/.9) 16%,rgba(255,255,255,.8) 50%,rgb(var(--lamp)/.9) 84%,transparent);box-shadow:0 0 14px rgb(var(--lamp)/.75)}
+.curtain-knob{position:absolute;left:-23px;top:76%;width:46px;height:46px;margin-top:-23px;padding:0;border-radius:50%;display:grid;place-items:center;
+  pointer-events:auto;cursor:ew-resize;touch-action:pan-y;color:var(--ink);border:1px solid rgba(255,255,255,.36);
+  background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.3),rgba(255,255,255,.06) 50%,rgba(8,10,15,.35) 100%);
+  -webkit-backdrop-filter:blur(10px) saturate(180%);backdrop-filter:blur(10px) saturate(180%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 0 0 1px rgb(var(--lamp)/.28),0 12px 28px -12px rgba(0,0,0,.85),0 0 28px -6px rgb(var(--lamp)/.7);
+  transition:box-shadow .3s ease,border-color .3s ease}
+.curtain-knob:hover,.curtain-knob:active{border-color:rgb(var(--lamp)/.8);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 0 0 5px rgb(var(--lamp)/.16),0 12px 28px -12px rgba(0,0,0,.85),0 0 34px -4px rgb(var(--lamp)/.9)}
+.curtain-knob svg{width:18px;height:18px;pointer-events:none}
+.lite .curtain-knob{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(20,24,33,.92)}
+.curtain-tag{position:absolute;top:7%;white-space:nowrap;padding:6px 9px;border-radius:999px;background:rgba(8,10,15,.62);border:1px solid rgba(255,255,255,.16);
+  font-family:var(--f-mono);font-size:9.5px;line-height:1;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);transition:opacity .3s ease}
+.curtain-tag.l{right:10px}
+.curtain-tag.r{left:10px}
+.curtain.at-l .curtain-tag.l,.curtain.at-r .curtain-tag.r{display:none}
+
+/* ============ бегущая строка ============ */
+.mq{display:none}
+.motion .mq{display:block;margin-top:clamp(60px,9vw,128px);overflow:hidden;white-space:nowrap;user-select:none;-webkit-user-select:none;pointer-events:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.mq-track{display:inline-flex;align-items:center;gap:clamp(20px,3vw,46px);padding-right:clamp(20px,3vw,46px);will-change:transform}
+/* контур рисуется под заливкой (paint-order): так не видно швов внутри букв вариативного шрифта */
+.mq-track span{font-family:var(--f-disp);font-weight:200;font-size:clamp(46px,8.6vw,124px);line-height:1.12;letter-spacing:-.045em;
+  color:rgba(5,7,11,.86);-webkit-text-stroke:2px rgba(255,255,255,.3);paint-order:stroke fill}
+.mq-track span:nth-of-type(3n+1){-webkit-text-stroke-color:rgb(var(--lamp)/.5)}
+.mq-track i{flex:none;width:8px;height:8px;border-radius:50%;background:rgb(var(--lamp));box-shadow:0 0 16px 3px rgb(var(--lamp)/.7)}
+
 /* ============ пакеты ============ */
 .pack{text-decoration:none;color:inherit;gap:10px}
 .pack .ix{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
@@ -164,9 +200,27 @@
 .pack.pick .pr{color:rgb(var(--lamp))}
 .packs-foot{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center;justify-content:space-between;margin-top:22px}
 .packs-foot p{max-width:64ch;flex:1 1 320px;color:var(--ink-2)}
+/* пакеты стопкой (home.js + GSAP): четыре плиты прилипают друг под другом, у накрытых видна полоса «название — цена».
+   --i ставит скрипт (номер плиты), --cov — насколько плита накрыта следующей. Без GSAP остаётся одна плита с ячейками. */
+.packs.stack{--stk-top:calc(var(--nav-h) + 4px);--stk-step:68px;display:block;counter-reset:pk}
+/* запас прокрутки после последней плиты: пока он проезжает, собранная стопка стоит на месте */
+.packs.stack::after{content:"";display:block;height:clamp(120px,24vh,240px)}
+.packs.stack .pack{position:sticky;top:calc(var(--stk-top) + var(--i,0)*var(--stk-step));display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 24px;
+  min-height:156px;margin:0 0 16px;padding:13px clamp(18px,2.6vw,32px) 24px;border-left:1px solid var(--line);
+  background:linear-gradient(135deg,rgba(255,255,255,.09) 0%,rgba(255,255,255,.03) 46%,rgba(255,255,255,.05) 100%),rgba(10,13,19,.9);
+  transform:scale(calc(1 - var(--cov,0)*.035));transform-origin:50% 0;transition:border-color .3s ease}
+.packs.stack .pack:last-child{margin-bottom:0}
+.packs.stack .pack:hover{border-color:var(--line-2)}
+.packs.stack .pack.pick{background:linear-gradient(180deg,rgb(var(--lamp)/.2),rgb(var(--lamp)/.05)),rgba(10,13,19,.92)}
+.packs.stack .pack .ix{grid-column:1;grid-row:1;min-height:42px}
+.packs.stack .pack .ix::before{counter-increment:pk;content:counter(pk,decimal-leading-zero);color:var(--ink-4);margin-right:2px}
+.packs.stack .pack .pr{grid-column:2;grid-row:1;justify-self:end}
+.packs.stack .pack p{grid-column:1/-1;max-width:70ch;font-size:15px;opacity:calc(1 - var(--cov,0)*.85)}
 
 /* ============ адаптив ============ */
 @media (max-width:1099px){
+  .packs.stack{--stk-top:10px}
+  .curtain-knob{top:80%}
   .hero{justify-content:flex-start;padding-top:calc(var(--nav-h) - 6px)}
   .hero-in{grid-template-columns:1fr;gap:6px;flex:0 0 auto}
   .hero-vis{order:-1;min-height:clamp(250px,40svh,460px)}
@@ -185,6 +239,9 @@
   .stat:nth-child(-n+2){border-top:0}
 }
 @media (max-width:640px){
+  .packs.stack{--stk-step:58px}
+  .packs.stack .pack{min-height:140px;padding-top:11px}
+  .packs.stack .pack .ix{min-height:36px}
   .deck{grid-template-columns:1fr}
   .deck>*{border-left:0;border-top:1px solid var(--line-3)}
   .deck>*:first-child{border-top:0}

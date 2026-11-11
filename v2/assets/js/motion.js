@@ -8,6 +8,7 @@
      ok                — эффекты включены (остальные скрипты смотрят сюда);
      num(el,a,b,opts)  — число «набегает» от a к b;
      sparks(el,n)      — искры света из элемента;
+     refresh()         — пересчитать всё, что привязано к прокрутке (после смены вёрстки);
      MM                — миллиметров в одном пикселе экрана.
    ============================================================ */
 (function(){
@@ -85,6 +86,7 @@ function countUp(el){
    Под заголовком — размерная линия во всю ширину текста с числом в миллиметрах;
    под ценой — такая же линия без числа (число там — сама цена).
    ============================================================ */
+var remeasure=[];      /* перемерить все линии после пересчёта вёрстки (шрифты догрузились, окно изменилось) */
 function textWidth(host,before){
   var r=doc.createRange();r.setStart(host,0);
   if(before)r.setEndBefore(before);else r.setEnd(host,host.childNodes.length);
@@ -102,12 +104,12 @@ function dimLine(host,withNum){
     w=nw;d.style.width=w+'px';
     if(done&&num&&!num._vtNum)num.textContent=sp(w*MM);
   }
-  measure();host._vtMeasure=measure;
+  measure();host._vtMeasure=measure;remeasure.push(measure);
   var tl=gsap.timeline({paused:true});
   tl.fromTo(d.querySelectorAll('.dim-l'),{scaleX:0},{scaleX:1,duration:withNum?.8:.7,stagger:.16},0)
     .fromTo(d.querySelectorAll('.dim-t'),{opacity:0,scale:.2},{opacity:1,scale:1,duration:.45,ease:'vtSpring',stagger:withNum?.75:.5},0);
   if(num)tl.fromTo(num,{opacity:0},{opacity:1,duration:.4},.2);
-  ST.create({trigger:host,start:'top 90%',end:'max',once:true,onRefresh:measure,onEnter:function(){
+  ST.create({trigger:host,start:'top 90%',end:'max',once:true,onEnter:function(){
     done=true;tl.play();
     if(num)M.num(num,0,w*MM,{dur:1.1,fmt:sp});
   }});
@@ -250,7 +252,7 @@ function plane(){
     var s=a.querySelector('svg'),p=s&&s.querySelector('path');
     if(p&&/^M20\.5 3\.5/.test(p.getAttribute('d')||''))list.push({a:a,svg:s,busy:false,t:0});
   });
-  function fly(o){
+  function fly(o,loud){
     var now=Date.now();
     if(o.busy||now-o.t<2600)return;
     var r=o.svg.getBoundingClientRect();
@@ -284,11 +286,11 @@ function plane(){
         .to(path,{drawSVG:'100% 100%',duration:.5,ease:'power1.in'},1.5);
     }else tl.set(path,{opacity:0},0);
     tl.fromTo(o.svg,{opacity:0,scale:.3,rotate:-35},{opacity:1,scale:1,rotate:0,duration:.6,ease:'vtSpring',clearProps:'opacity,transform,scale,rotate'},1.75);
-    if(VT.sound)VT.sound.play('whoosh');
+    if(loud&&VT.sound)VT.sound.play('whoosh');      /* звук — только по нажатию, наведение летает молча */
   }
   list.forEach(function(o){
-    if(fine)o.a.addEventListener('pointerenter',function(e){if(!e.pointerType||e.pointerType==='mouse')fly(o)});
-    o.a.addEventListener('click',function(){fly(o)});
+    if(fine)o.a.addEventListener('pointerenter',function(e){if(!e.pointerType||e.pointerType==='mouse')fly(o,false)});
+    o.a.addEventListener('click',function(){fly(o,true)});
   });
 }
 
@@ -321,10 +323,12 @@ function lit(){
   var S=window.SplitText;
   if(!S)return;
   each($$('[data-lit]'),function(el){
-    var sp2;
+    /* текст для экранных читалок берём до деления: перенос строки (<br>) в нём становится пробелом */
+    var sp2,label=(el.innerText||el.textContent||'').replace(/\s+/g,' ').trim();
     try{sp2=S.create(el,{type:'words',wordsClass:'lw',aria:'auto'})}catch(e){return}
     var ws=sp2.words||[];
     if(!ws.length)return;
+    if(label)el.setAttribute('aria-label',label);
     /* двигать слова не нужно, поэтому оставляем их обычным текстом: перенос строк остаётся прежним */
     ws.forEach(function(w){w.style.display='inline'});
     el.classList.add('lit-on');
@@ -369,6 +373,7 @@ each($$('.pack .pr,.tprice'),function(p){dimLine(p,false)});
 each($$('[data-count]'),countUp);
 ruler();magnet();cursor();plane();bend();
 
+ST.addEventListener('refresh',function(){remeasure.forEach(function(f){f()})});
 M.refresh=function(){ST.refresh()};
 if(doc.fonts&&doc.fonts.ready)doc.fonts.ready.then(function(){ST.refresh()});
 window.addEventListener('load',function(){ST.refresh()});

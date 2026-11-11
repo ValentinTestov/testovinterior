@@ -437,6 +437,11 @@ details.extra[open] summary::before{content:"– "}
   .icard.on .crow{animation:none;clip-path:inset(0 0 0 0)}
 }
 
+/* 320px: длинное слово в заголовке правил («конфиденциальности») иначе шире экрана */
+@media (max-width:340px){
+  .legal h2{font-size:21px}
+}
+
 /* ============ печать чек-листа ============ */
 @media print{
   .setup,.filters2,.sacts,.cta,.inote textarea,.ist,.disc,.tools,.plab,#pSave,.phead .lab,.aplan{display:none!important}

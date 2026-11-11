@@ -35,7 +35,7 @@
 .intro-on body{overflow:hidden}
 
 /* ============ первый экран ============ */
-.hero{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;gap:clamp(18px,3vw,34px);
+.hero{position:relative;overflow-x:clip;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;gap:clamp(18px,3vw,34px);
   padding-top:calc(var(--nav-h) + 8px);padding-bottom:clamp(20px,4vw,46px)}
 .hero-in{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:clamp(16px,3vw,48px);align-items:center;flex:1 1 auto}
 .hero-txt{display:grid;gap:clamp(16px,2vw,26px);justify-items:start;position:relative;z-index:2}
@@ -177,7 +177,7 @@
   font-family:var(--f-mono);font-size:9.5px;line-height:1;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);transition:opacity .3s ease}
 .curtain-tag.l{right:10px}
 .curtain-tag.r{left:10px}
-.curtain.at-l .curtain-tag.l,.curtain.at-r .curtain-tag.r{opacity:0}
+.curtain.at-l .curtain-tag.l,.curtain.at-r .curtain-tag.r{display:none}
 
 /* ============ бегущая строка ============ */
 .mq{display:none}

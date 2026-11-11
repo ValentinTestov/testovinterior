@@ -68,7 +68,9 @@ function countUp(el){
   }
   if(!nodes.length)return;
   var s={p:0};
-  function paint(){nodes.forEach(function(o){o.n.nodeValue=o.t.replace(/\d+/g,function(d){return String(Math.round(+d*s.p))})})}
+  /* ведущие нули держат ширину: «0000 → 1000», а не «0 → 1000», вёрстка вокруг не прыгает */
+  function pad(v,n){v=String(v);while(v.length<n)v='0'+v;return v}
+  function paint(){nodes.forEach(function(o){o.n.nodeValue=o.t.replace(/\d+/g,function(d){return pad(Math.round(+d*s.p),d.length)})})}
   function end(){s.p=1;paint();el._vtCounting=false;if(el._vtMeasure)el._vtMeasure()}
   el._vtCounting=true;                           /* пока число не досчитано, размерная линия ширину не перемеряет */
   paint();

@@ -264,7 +264,7 @@ function curtain(){
   var grab=function(){touched=true;if(demo){demo.kill();demo=null}if(hero)hero.classList.add('dragged')};
   el.hidden=false;paint(0);
   drag=D.create(el,{
-    type:'x',trigger:knob,bounds:{minX:0,maxX:w},inertia:!!window.InertiaPlugin,edgeResistance:.92,throwResistance:2600,
+    type:'x',trigger:knob,bounds:{minX:0,maxX:w-4},inertia:!!window.InertiaPlugin,edgeResistance:.92,throwResistance:2600,
     cursor:'ew-resize',activeCursor:'ew-resize',zIndexBoost:false,
     onPress:grab,
     onDrag:function(){paint(this.x/w,false)},
@@ -278,7 +278,7 @@ function curtain(){
   var fit=function(){
     var nw=vis.clientWidth;
     if(!nw||nw===w)return;
-    w=nw;drag.applyBounds({minX:0,maxX:w});paint(frac);
+    w=nw;drag.applyBounds({minX:0,maxX:w-4});paint(frac);
   };
   window.addEventListener('resize',fit);
   ST.addEventListener('refresh',fit);

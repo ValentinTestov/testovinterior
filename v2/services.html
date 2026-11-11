@@ -174,9 +174,181 @@
             <span class="ap"><b>150 ₽/м²</b><i></i></span></label>
         </div>
 
-        <a class="abar" id="abar" href="#asum" hidden></a>
+        <a class="abar" id="abar" href="#aside" hidden></a>
       </div>
 
+      <div class="aside" id="aside">
+        <!-- Живой план: у каждого чертежа из списка слева — свой слой (data-l совпадает с value галочки).
+             Отметили чертёж — слой прорисовывается (services.js, DrawSVG). Без скриптов движения слои просто включаются. -->
+        <div class="aplan glass flat" id="aplan">
+          <div class="aphead"><span>ваш комплект на плане</span><span><b id="apN">0</b> из 13</span></div>
+          <svg id="apSvg" viewBox="0 0 340 250" role="img" aria-label="Схема квартиры: отмеченные чертежи появляются на ней слоями">
+            <g class="pg"><path d="M38,36H308V216H38ZM200,36V216M200,132H308M252,132V216"/></g>
+            <g class="pl" data-l="obmer"><!-- обмерный план: стены, окна, размеры, стояк и щиток -->
+              <path class="w" d="M76,36H38V216H212M236,216H308V36H284M226,36H150"/>
+              <path class="w2" d="M200,36V150M200,196V216M200,132H208M230,132H308M252,132V150M252,170V216"/>
+              <path class="t" d="M76,34.4H150M76,37.6H150M76,33V39M150,33V39M226,34.4H284M226,37.6H284M226,33V39M284,33V39"/>
+              <path class="d" d="M38,30V12M308,30V12M38,16H308M35.5,18.5l5,-5M305.5,18.5l5,-5"/>
+              <path class="d" d="M32,36H14M32,216H14M18,36V216M15.5,38.5l5,-5M15.5,218.5l5,-5"/>
+              <text class="tx nf" x="173" y="12" text-anchor="middle">8 400</text>
+              <text class="tx nf" x="14" y="126" text-anchor="middle" transform="rotate(-90 14 126)">5 600</text>
+              <circle class="t" cx="301.5" cy="164" r="2.6"/>
+              <rect class="t" x="203" y="200" width="3.4" height="11"/>
+            </g>
+            <g class="pl" data-l="plan"><!-- планировочное решение: мебель и двери -->
+              <path class="f" d="M212,216V192M212,192A24,24 0 0 1 236,216M208,132V110M208,110A22,22 0 0 1 230,132M252,170H272M272,170A20,20 0 0 0 252,150"/>
+              <rect class="f" x="44" y="58" width="24" height="62" rx="3"/>
+              <path class="f" d="M50,60V118M50,79H68M50,99H68"/>
+              <rect class="f" x="82" y="76" width="20" height="26" rx="3"/>
+              <rect class="f" x="190" y="62" width="7" height="54"/>
+              <circle class="f" cx="118" cy="158" r="12"/>
+              <circle class="f" cx="118" cy="141.5" r="3.6"/>
+              <circle class="f" cx="118" cy="174.5" r="3.6"/>
+              <circle class="f" cx="101.5" cy="158" r="3.6"/>
+              <circle class="f" cx="134.5" cy="158" r="3.6"/>
+              <path class="f" d="M42,146H61V193H150V212H42Z"/>
+              <rect class="f" x="46" y="160" width="11" height="16" rx="2"/>
+              <rect class="f" x="95" y="196" width="15" height="13" rx="1.5"/>
+              <path class="f" d="M97.7,200h2.6M99,198.7v2.6M104.7,200h2.6M106,198.7v2.6M97.7,205.5h2.6M99,204.2v2.6M104.7,205.5h2.6M106,204.2v2.6"/>
+              <rect class="f" x="132" y="195.5" width="16" height="14.5"/>
+              <rect class="f" x="240" y="66" width="64" height="50" rx="2"/>
+              <path class="f" d="M280,66V116"/>
+              <rect class="f" x="292" y="70" width="10" height="19" rx="2"/>
+              <rect class="f" x="292" y="93" width="10" height="19" rx="2"/>
+              <rect class="f" x="295" y="54" width="9" height="10"/>
+              <rect class="f" x="295" y="118" width="9" height="10"/>
+              <rect class="f" x="204" y="40" width="16" height="58"/>
+              <path class="f" d="M204,40L220,98M220,40L204,98"/>
+              <rect class="f" x="240" y="176" width="10" height="36"/>
+              <path class="f" d="M240,176L250,212"/>
+            </g>
+            <g class="pl" data-l="mood"><!-- мудборд: настроение по зонам и образцы цветов -->
+              <rect class="nf" x="40.5" y="38.5" width="157.5" height="175.5" fill="#A3B29C" fill-opacity=".1" stroke="none"/>
+              <rect class="nf" x="202" y="38.5" width="104.5" height="92" fill="#C3A279" fill-opacity=".12" stroke="none"/>
+              <rect class="nf" x="254" y="134" width="52.5" height="80" fill="#EDE7DA" fill-opacity=".07" stroke="none"/>
+              <rect class="psw nf" x="38" y="226" width="11" height="11" rx="2.5" fill="#EDE7DA"/>
+              <rect class="psw nf" x="52" y="226" width="11" height="11" rx="2.5" fill="#A3B29C"/>
+              <rect class="psw nf" x="66" y="226" width="11" height="11" rx="2.5" fill="#2E4237"/>
+              <rect class="psw nf" x="80" y="226" width="11" height="11" rx="2.5" fill="#B2914E"/>
+              <rect class="psw nf" x="94" y="226" width="11" height="11" rx="2.5" fill="#C3A279"/>
+            </g>
+            <g class="pl" data-l="spisok"><!-- список мебели: позиции с номерами -->
+              <circle class="cn nf" cx="56" cy="89" r="5.2"/>
+              <circle class="cn nf" cx="118" cy="158" r="5.2"/>
+              <circle class="cn nf" cx="84" cy="202" r="5.2"/>
+              <circle class="cn nf" cx="270" cy="76" r="5.2"/>
+              <circle class="cn nf" cx="212" cy="69" r="5.2"/>
+              <circle class="cn nf" cx="245" cy="194" r="5.2"/>
+              <text class="ct nf" x="56" y="91.3" text-anchor="middle">1</text>
+              <text class="ct nf" x="118" y="160.3" text-anchor="middle">2</text>
+              <text class="ct nf" x="84" y="204.3" text-anchor="middle">3</text>
+              <text class="ct nf" x="270" y="78.3" text-anchor="middle">4</text>
+              <text class="ct nf" x="212" y="71.3" text-anchor="middle">5</text>
+              <text class="ct nf" x="245" y="196.3" text-anchor="middle">6</text>
+            </g>
+            <g class="pl" data-l="demont"><!-- план демонтажа: что сносим -->
+              <path class="dm" d="M198,150V196M202,150V196M61,144H150M61,148H150"/>
+              <path class="t" d="M196.6,158.6l6.8,6.8m0,-6.8l-6.8,6.8M196.6,180.6l6.8,6.8m0,-6.8l-6.8,6.8M84.6,142.6l6.8,6.8m0,-6.8l-6.8,6.8M120.6,142.6l6.8,6.8m0,-6.8l-6.8,6.8"/>
+            </g>
+            <g class="pl" data-l="mont"><!-- план монтажа: новые перегородки -->
+              <path class="mn" d="M249.6,137.4l4.8,-4M249.6,141.4l4.8,-4M249.6,145.4l4.8,-4M249.6,149.4l4.8,-4M249.6,175.4l4.8,-4M249.6,179.4l4.8,-4M249.6,183.4l4.8,-4M249.6,187.4l4.8,-4M249.6,191.4l4.8,-4M249.6,195.4l4.8,-4M249.6,199.4l4.8,-4M249.6,203.4l4.8,-4M249.6,207.4l4.8,-4M249.6,211.4l4.8,-4M249.6,215.4l4.8,-4M235.4,134.4l-4,-4.8M239.4,134.4l-4,-4.8M243.4,134.4l-4,-4.8M247.4,134.4l-4,-4.8M251.4,134.4l-4,-4.8M255.4,134.4l-4,-4.8M259.4,134.4l-4,-4.8M263.4,134.4l-4,-4.8M267.4,134.4l-4,-4.8M271.4,134.4l-4,-4.8M275.4,134.4l-4,-4.8M279.4,134.4l-4,-4.8M283.4,134.4l-4,-4.8M287.4,134.4l-4,-4.8M291.4,134.4l-4,-4.8M295.4,134.4l-4,-4.8M299.4,134.4l-4,-4.8M303.4,134.4l-4,-4.8M307.4,134.4l-4,-4.8"/>
+              <path class="mn" d="M238.6,176V214M238.6,176H250.9"/>
+            </g>
+            <g class="pl" data-l="poly"><!-- план полов: покрытия и направление укладки -->
+              <path class="fl" d="M41,47H198M41,56H198M41,65H198M41,74H198M41,83H198M41,92H198M41,101H198M41,110H198M41,119H198M41,128H198M41,137H198M41,146H198M41,155H198M41,164H198M41,173H198M41,182H198M41,191H198M41,200H198M41,209H198"/>
+              <path class="fl" d="M210,39V130M219,39V130M228,39V130M237,39V130M246,39V130M255,39V130M264,39V130M273,39V130M282,39V130M291,39V130M300,39V130"/>
+              <path class="fl" d="M209,134V214M218,134V214M227,134V214M236,134V214M245,134V214M254,134V214M263,134V214M272,134V214M281,134V214M290,134V214M299,134V214M202,143H306M202,152H306M202,161H306M202,170H306M202,179H306M202,188H306M202,197H306M202,206H306"/>
+              <path class="t" d="M158,206H180M175,203l5,3l-5,3"/>
+            </g>
+            <g class="pl" data-l="potolki"><!-- план потолков: уровни, короба, ниши -->
+              <rect class="cl" x="48" y="47" width="144" height="160" rx="3"/>
+              <rect class="cl" x="208" y="45" width="92" height="79" rx="3"/>
+              <path class="t" d="M70,41.6H156M70,44.2H156M220,41.6H290"/>
+              <text class="tx nf" x="74" y="133">h 2 650</text>
+            </g>
+            <g class="pl" data-l="svet"><!-- план освещения и выключателей -->
+              <circle cx="86" cy="54" r="2"/>
+              <circle cx="132" cy="54" r="2"/>
+              <circle cx="178" cy="54" r="2"/>
+              <circle cx="86" cy="112" r="2"/>
+              <circle cx="132" cy="112" r="2"/>
+              <circle cx="178" cy="112" r="2"/>
+              <circle cx="226" cy="48" r="2"/>
+              <circle cx="226" cy="92" r="2"/>
+              <circle cx="270" cy="168" r="2"/>
+              <circle cx="270" cy="192" r="2"/>
+              <circle cx="226" cy="146" r="2"/>
+              <circle cx="226" cy="184" r="2"/>
+              <circle cx="118" cy="158" r="4.6"/>
+              <path d="M113.4,158h9.2M118,153.4v9.2"/>
+              <circle cx="258" cy="91" r="4.4"/>
+              <path d="M253.6,91h8.8M258,86.6v8.8"/>
+              <path d="M64,190.5H150"/>
+              <path class="ar" d="M204.5,146.5Q214,139 224.2,145.2M232.5,129Q246,112 255,94.6M196.5,146Q193,126 179.6,113.4M238.5,211Q239,196 227.6,185.6"/>
+              <circle class="dot nf" cx="204.5" cy="146.5" r="1.5"/>
+              <circle class="dot nf" cx="232.5" cy="129" r="1.5"/>
+              <circle class="dot nf" cx="196.5" cy="146" r="1.5"/>
+              <circle class="dot nf" cx="238.5" cy="211" r="1.5"/>
+            </g>
+            <g class="pl" data-l="rozetki"><!-- план розеток и выводов -->
+              <path d="M39.6,47.4A2.6,2.6 0 0 1 39.6,52.6M42.2,50h2.2"/>
+              <path d="M39.6,127.4A2.6,2.6 0 0 1 39.6,132.6M42.2,130h2.2"/>
+              <path d="M198.9,69.4A2.6,2.6 0 0 0 198.9,74.6M196.3,72h-2.2"/>
+              <path d="M198.9,103.4A2.6,2.6 0 0 0 198.9,108.6M196.3,106h-2.2"/>
+              <path d="M163.4,37.6A2.6,2.6 0 0 0 168.6,37.6M166,40.2v2.2"/>
+              <path d="M69.4,214.4A2.6,2.6 0 0 1 74.6,214.4M72,211.8v-2.2"/>
+              <path d="M87.4,214.4A2.6,2.6 0 0 1 92.6,214.4M90,211.8v-2.2"/>
+              <path d="M121.4,214.4A2.6,2.6 0 0 1 126.6,214.4M124,211.8v-2.2"/>
+              <path d="M141.4,214.4A2.6,2.6 0 0 1 146.6,214.4M144,211.8v-2.2"/>
+              <path d="M306.4,57.4A2.6,2.6 0 0 0 306.4,62.6M303.8,60h-2.2"/>
+              <path d="M306.4,119.4A2.6,2.6 0 0 0 306.4,124.6M303.8,122h-2.2"/>
+              <path d="M201.1,115.4A2.6,2.6 0 0 1 201.1,120.6M203.7,118h2.2"/>
+              <path d="M293.4,214.4A2.6,2.6 0 0 1 298.6,214.4M296,211.8v-2.2"/>
+              <path d="M253.1,193.4A2.6,2.6 0 0 1 253.1,198.6M255.7,196h2.2"/>
+              <path d="M243.4,214.4A2.6,2.6 0 0 1 248.6,214.4M246,211.8v-2.2"/>
+              <path d="M237.4,133.1A2.6,2.6 0 0 0 242.6,133.1M240,135.7v2.2"/>
+            </g>
+            <g class="pl" data-l="razv"><!-- развёртки стен: откуда смотрим на каждую стену -->
+              <circle cx="150" cy="96" r="7"/>
+              <path d="M143,96h14M150,89v14"/>
+              <path class="tri nf" d="M150,82.5L146.4,88.2H153.6ZM150,109.5L146.4,103.8H153.6ZM136.5,96L142.2,92.4V99.6ZM163.5,96L157.8,92.4V99.6Z"/>
+              <text class="tx nf" x="150" y="79.6" text-anchor="middle">А</text>
+              <text class="tx nf" x="169.6" y="98.6" text-anchor="middle">Б</text>
+              <text class="tx nf" x="150" y="118" text-anchor="middle">В</text>
+              <text class="tx nf" x="130.4" y="98.6" text-anchor="middle">Г</text>
+              <circle cx="230" cy="112" r="4.4"/>
+              <path class="tri nf" d="M230,103.6L227.6,107.4H232.4ZM230,120.4L227.6,116.6H232.4ZM221.6,112L225.4,109.6V114.4ZM238.4,112L234.6,109.6V114.4Z"/>
+            </g>
+            <g class="pl" data-l="voda"><!-- план водоснабжения и канализации -->
+              <rect x="258" y="137.5" width="46" height="17" rx="7"/>
+              <rect x="261.4" y="140.4" width="39.2" height="11.2" rx="5"/>
+              <rect x="300.5" y="170" width="4.6" height="12"/>
+              <ellipse cx="294" cy="176" rx="6.5" ry="5"/>
+              <rect x="287" y="197" width="17" height="15"/>
+              <circle cx="295.5" cy="204.5" r="4.6"/>
+              <rect x="259" y="202" width="20" height="11" rx="2"/>
+              <circle cx="269" cy="207.5" r="3"/>
+              <circle cx="45.5" cy="208" r="2.4"/>
+              <path class="pp" d="M300.3,161.7L297,158V154.5M302.7,166.3V170M299,165.2L284,170V199.5H287M284,199.5V207.5H279M45.5,205.6V176"/>
+              <circle class="dot nf" cx="301.5" cy="164" r="1.3"/>
+              <circle class="dot nf" cx="45.5" cy="208" r="1.1"/>
+            </g>
+            <g class="pl" data-l="vent"><!-- план вентиляции и кондиционирования -->
+              <rect x="156" y="39.6" width="32" height="7" rx="2"/>
+              <rect x="163" y="22" width="18" height="7" rx="1.5"/>
+              <rect x="287" y="39.6" width="17" height="7" rx="2"/>
+              <rect x="287" y="22" width="17" height="7" rx="1.5"/>
+              <path class="du" d="M172,39.6V29M295.5,39.6V29M93,196.5H53"/>
+              <rect x="93" y="193.4" width="19" height="5"/>
+              <rect x="43.6" y="194" width="9" height="9"/>
+              <path d="M43.6,194l9,9m0,-9l-9,9"/>
+              <circle cx="268" cy="184" r="3.6"/>
+              <path d="M265.5,181.5l5,5m0,-5l-5,5"/>
+              <path d="M273,184h7m-2.6,-2.2l2.6,2.2l-2.6,2.2M172,26v-6m-2.2,2.6l2.2,-2.6l2.2,2.6M295.5,26v-6m-2.2,2.6l2.2,-2.6l2.2,2.6"/>
+            </g>
+          </svg>
+          <p class="apnow" id="apNow">отметьте чертёж — он появится на плане</p>
+        </div>
       <aside class="asum glass" id="asum" aria-label="Расчёт стоимости чертежей">
         <div class="ashead">ваш расчёт</div>
         <div id="asBody">
@@ -194,6 +366,7 @@
         </div>
         <p class="sr" id="aLive" aria-live="polite"></p>
       </aside>
+      </div>
     </div>
 
     <p class="muted anote">Чертежи строятся по обмерам, а электрика, сантехника и развёртки — ещё и по расстановке мебели. Если обмеры или планировка у вас уже есть, пришлите — посмотрю, можно ли работать по ним. Цены здесь — ориентир, итоговую назову после брифа.</p>

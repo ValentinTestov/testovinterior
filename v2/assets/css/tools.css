@@ -99,6 +99,50 @@
 .anote{margin:22px 0 0;max-width:74ch}
 .abar{display:none}
 
+/* ============ услуги: живой план ============
+   Правая колонка — план и расчёт вместе; она прилипает, а если не помещается в экран,
+   прокручивается только список в расчёте: план, итог и кнопки остаются на виду. */
+.aside{position:sticky;top:calc(var(--nav-h) + 4px);display:flex;flex-direction:column;gap:12px;min-width:0;
+  max-height:calc(100vh - var(--nav-h) - 18px);scroll-margin-top:calc(var(--nav-h) + 4px)}
+.aside .asum{position:relative;top:auto;display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+.aside #asBody{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;margin-right:-12px;padding-right:12px}
+.aside .aacts{flex:none}
+.aplan{flex:none;padding:14px 14px 12px}
+.aphead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 4px 8px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:rgb(var(--lamp))}
+.aphead span:last-child{color:var(--ink-3)}
+.aphead b{font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.aplan svg{display:block;width:100%;height:auto;max-height:min(238px,31vh);margin:0 auto;overflow:visible}
+.apnow{margin:8px 4px 0;min-height:15px;font-family:var(--f-mono);font-size:10px;line-height:1.5;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);transition:color .5s ease}
+.apnow.hot{color:rgb(var(--lamp))}
+/* пока обмеров нет, квартира намечена пунктиром — слоям есть к чему привязаться */
+.pg{fill:none;stroke:rgba(255,255,255,.2);stroke-width:1;stroke-dasharray:3 3;transition:opacity .6s ease}
+.aplan.walls .pg{opacity:0}
+.pl{fill:none;stroke:var(--ink-2);stroke-width:1;stroke-linecap:round;stroke-linejoin:round;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s linear .3s}
+.pl.on{opacity:1;visibility:visible;transition-delay:0s}
+.pl *{transition:stroke 1s ease}
+.pl.fresh :not(.nf){stroke:rgb(var(--lamp))}   /* только что добавленный слой — цветом лампы, потом остывает */
+.pl .w{stroke:var(--ink);stroke-width:3;stroke-linecap:square}
+.pl .w2{stroke:var(--ink);stroke-width:2;stroke-linecap:square}
+.pl .t{stroke-width:.9}
+.pl .d{stroke:rgb(var(--lamp));stroke-width:.8}
+.pl .tx{fill:var(--ink-2);stroke:none;font-family:var(--f-mono);font-size:7.5px;letter-spacing:.06em}
+.pl .f{stroke:var(--ink-3)}
+.pl .psw{stroke:rgba(255,255,255,.35);stroke-width:.6}
+.pl .cn{fill:var(--bg-2);stroke:rgb(var(--lamp));stroke-width:.9}
+.pl .ct{fill:rgb(var(--lamp));stroke:none;font-family:var(--f-mono);font-size:6.6px}
+.pl .dm{stroke:var(--ink-3);stroke-dasharray:3 2.4}
+.pl .mn{stroke:var(--ink);stroke-width:.9}
+.pl .fl{stroke:var(--ink-4);stroke-width:.5}
+.pl .cl{stroke:var(--ink-3);stroke-width:.9;stroke-dasharray:4.5 3}
+.pl[data-l="svet"]{stroke:rgb(var(--lamp))}
+.pl .ar{stroke-width:.7;stroke-dasharray:2 2}
+.pl .dot{fill:rgb(var(--lamp));stroke:none}
+.pl[data-l="rozetki"]{stroke:var(--ink)}
+.pl .tri{fill:var(--ink-2);stroke:none}
+.pl .pp{stroke-width:.9;stroke-dasharray:5 1.6 1 1.6}
+.pl[data-l="vent"]{stroke:var(--ink-3)}
+.pl .du{stroke-dasharray:2.6 2.2}
+
 /* ============ рулетка ============ */
 .rbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:22px 0 12px}
 .frame{padding:8px;border-radius:var(--r-xl)}
@@ -315,9 +359,29 @@ details.extra[open] summary::before{content:"– "}
 .toc{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
 
 /* ============ адаптив ============ */
+/* невысокое окно на ПК (ноутбук): план и поля ужимаются, чтобы итог и кнопки оставались на виду */
+@media (min-width:901px) and (max-height:780px){
+  .aside{gap:10px}
+  .aplan{padding:10px 12px 8px}
+  .aplan svg{max-height:24vh}
+  .aphead{margin-bottom:5px}
+  .apnow{margin-top:5px}
+  .aside .asum{padding:15px 18px 14px}
+  .aside .ashead{margin-bottom:8px}
+  .aside .abig{font-size:28px;margin:5px 0 4px}
+  .aside .aacts{margin-top:10px;padding-top:10px}
+}
+/* совсем низкое окно: колонка не прилипает, иначе расчёт не помещается */
+@media (min-width:901px) and (max-height:600px){
+  .aside{position:static;max-height:none}
+  .aside #asBody{overflow:visible;margin-right:0;padding-right:0}
+}
 @media (max-width:900px){
   .ala{grid-template-columns:minmax(0,1fr)}
   .asum{position:relative;top:auto}
+  .aside{position:static;max-height:none;margin-top:16px}
+  .aside #asBody{overflow:visible;margin-right:0;padding-right:0}
+  .aplan svg{max-height:none}
   /* на телефоне расчёт оказывается под списком — итог едет следом в плашке снизу */
   .abar{position:sticky;z-index:5;bottom:calc(var(--dock-h) + 14px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:12px;margin-top:16px;padding:12px 18px;border-radius:999px;
     text-decoration:none;color:var(--ink);background:linear-gradient(180deg,rgba(46,52,66,.86),rgba(14,17,24,.92));border:1px solid var(--line-2);
@@ -370,7 +434,7 @@ details.extra[open] summary::before{content:"– "}
 
 /* ============ печать чек-листа ============ */
 @media print{
-  .setup,.filters2,.sacts,.cta,.inote textarea,.ist,.disc,.tools,.plab,#pSave,.phead .lab{display:none!important}
+  .setup,.filters2,.sacts,.cta,.inote textarea,.ist,.disc,.tools,.plab,#pSave,.phead .lab,.aplan{display:none!important}
   html,body{background:#fff!important;color:#000!important}
   body{display:block;font-size:13px}
   .page{padding:0}

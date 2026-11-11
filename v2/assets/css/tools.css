@@ -253,7 +253,12 @@ details.extra[open] summary::before{content:"– "}
 .res{margin-top:clamp(22px,3vw,32px)}
 .scene{position:relative;overflow:hidden;border-radius:var(--r-l);line-height:0;background:#030508;border:1px solid var(--line);box-shadow:0 40px 90px -40px rgba(0,0,0,.9),0 0 80px -30px rgb(var(--lamp)/.45)}
 .scene svg{width:100%;height:auto;display:block}
-.scenecap{position:absolute;left:12px;bottom:12px;padding:8px 12px;border-radius:999px;line-height:1.3;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink);
+/* перекраска (palitra.js + GSAP): прежняя комната под новой и блик валика на границе */
+.scene-old{position:absolute;inset:0;z-index:0}
+.scene>svg{position:relative;z-index:1}
+.scene-roll{position:absolute;z-index:2;top:0;bottom:0;left:0;width:16px;margin-left:-8px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.5) 42%,rgba(255,255,255,.9) 50%,rgba(255,255,255,.5) 58%,transparent);box-shadow:0 0 24px 4px rgb(var(--lamp)/.5)}
+.scenecap{position:absolute;z-index:3;left:12px;bottom:12px;padding:8px 12px;border-radius:999px;line-height:1.3;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink);
   background:rgba(6,8,12,.6);border:1px solid rgba(255,255,255,.16);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 .lightbar{margin-top:18px}
 .lightbar .seg{display:flex;width:100%}

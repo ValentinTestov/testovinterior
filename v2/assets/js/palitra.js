@@ -214,9 +214,31 @@ function paintPal(){
   document.getElementById('tip').innerHTML='<b>'+esc(st.pal.n)+' · '+esc(st.room.l)+'</b>'
     +esc(st.pal.d)+' '+esc(st.room.tip);
 }
-function render(){
-  document.getElementById('scene').innerHTML=scene();
+/* kind — что поменяли: 'pal' (гамма или комната) или 'light' (лампа). С GSAP новая комната
+   не подменяет прежнюю мгновенно, а накрывает её: гамма — слева направо, как валиком,
+   свет — кругом от светильника. Без kind и без GSAP — сразу. */
+var G=window.gsap,MO=!!(window.VT&&VT.motion&&VT.motion.ok&&G);
+function render(kind){
+  var box=document.getElementById('scene'),old=MO&&kind?box.querySelector(':scope > svg'):null,oldHTML=old?old.outerHTML:'';
+  box.innerHTML=scene();
   paintTemps();paintPal();
+  if(!oldHTML)return;
+  var svg=box.querySelector(':scope > svg'),under=document.createElement('div');
+  /* прежняя комната лежит под новой; её градиентам даём свои имена, чтобы не спорили с новыми */
+  under.className='scene-old';under.setAttribute('aria-hidden','true');
+  under.innerHTML=oldHTML.replace(/id="lamp"/g,'id="lamp0"').replace(/url\(#lamp\)/g,'url(#lamp0)')
+    .replace(/id="win"/g,'id="win0"').replace(/url\(#win\)/g,'url(#win0)').replace(/ role="img" aria-label="[^"]*"/,'');
+  box.insertBefore(under,svg);
+  var done=function(){if(under.parentNode)under.parentNode.removeChild(under);G.set(svg,{clearProps:'clipPath'})};
+  if(kind==='light'){
+    G.fromTo(svg,{clipPath:'circle(0% at 31.2% 20.5%)'},{clipPath:'circle(125% at 31.2% 20.5%)',duration:.95,ease:'power2.out',onComplete:done});
+  }else{
+    var roller=document.createElement('i');roller.className='scene-roll';box.appendChild(roller);
+    G.fromTo(svg,{clipPath:'inset(0% 100% 0% 0%)'},{clipPath:'inset(0% 0% 0% 0%)',duration:.85,ease:'power2.inOut',onComplete:done});
+    G.fromTo(roller,{left:'0%'},{left:'100%',duration:.85,ease:'power2.inOut',onComplete:function(){if(roller.parentNode)roller.parentNode.removeChild(roller)}});
+    /* полоса пропорций закрашивается следом, участок за участком */
+    G.from('#bar i',{scaleX:0,transformOrigin:'0 50%',duration:.5,stagger:.08,ease:'power2.out',clearProps:'transform'});
+  }
 }
 
 /* ============ события ============ */
@@ -227,7 +249,7 @@ document.getElementById('rooms').addEventListener('click',function(e){
   if(st.room.ok.indexOf(st.temp)<0){st.temp=st.room.ok[0];syncLight()}
   Array.prototype.forEach.call(this.querySelectorAll('.chip'),function(x){
     x.setAttribute('aria-pressed',String(x===b))});
-  goal('palitra_pick');hap('light');render();
+  goal('palitra_pick');hap('light');render('pal');
 });
 document.getElementById('pals').addEventListener('click',function(e){
   var b=e.target.closest('.chip');if(!b)return;
@@ -235,18 +257,18 @@ document.getElementById('pals').addEventListener('click',function(e){
   for(i=0;i<PALS.length;i++)if(PALS[i].id===id)st.pal=PALS[i];
   Array.prototype.forEach.call(this.querySelectorAll('.chip'),function(x){
     x.setAttribute('aria-pressed',String(x===b))});
-  goal('palitra_pick');hap('light');render();
+  goal('palitra_pick');hap('light');render('pal');
 });
 document.getElementById('temps').addEventListener('click',function(e){
   var b=e.target.closest('button');if(!b)return;
   st.temp=parseInt(b.getAttribute('data-temp'),10);syncLight();
-  goal('palitra_light');hap('light');render();
+  goal('palitra_light');hap('light');render('light');
 });
 document.getElementById('roll').addEventListener('click',function(){
   var pool=PALS.filter(function(p){return p.id!==st.pal.id});
   st.pal=pool[Math.floor(Math.random()*pool.length)];
   st.temp=st.room.ok[Math.floor(Math.random()*st.room.ok.length)];syncLight();
-  paintChips();goal('palitra_pick');hap('medium');render();
+  paintChips();goal('palitra_pick');hap('medium');render('pal');
   toast('подобрано: ' + st.pal.n.toLowerCase());
 });
 document.getElementById('plist').addEventListener('click',function(e){

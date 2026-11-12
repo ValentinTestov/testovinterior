@@ -297,15 +297,21 @@ function plane(){
 /* ============================================================
    СТЕКЛО ГНЁТСЯ (только мышь)
    При быстрой прокрутке плиты слегка скашиваются по ходу движения.
-   Угол лежит в переменной --bend, стили — в core.css (.bend).
+   Угол лежит в переменной --bend на самих плитах, стили — в core.css (.bend).
+   Плита внутри другой плиты не гнётся сама: иначе её скосит дважды.
    ============================================================ */
 function bend(){
   if(!fine)return;
-  var list=$$('main .stats,main .cells:not(.packs),main .tariffs,main .agroup,main .faq,main .steps,main .cta,main .setup,main .pick,main .frame,main .plist,main .sum,main .prog,main .aarea');
+  var all=Array.prototype.slice.call($$('main .stats,main .cells:not(.packs),main .tariffs,main .agroup,main .faq,main .steps,main .cta,main .setup,main section.pick,main .frame,main .plist,main .sum,main .prog,main .aarea'));
+  var list=all.filter(function(el){return !all.some(function(o){return o!==el&&o.contains(el)})});
   if(!list.length)return;
-  each(list,function(el){el.classList.add('bend')});
-  var p={v:0},lim=clamp(-1.5,1.5);
-  function paint(){root.style.setProperty('--bend',p.v.toFixed(3))}
+  list.forEach(function(el){el.classList.add('bend')});
+  var p={v:0},lim=clamp(-1.5,1.5),last='';
+  function paint(){
+    var v=p.v.toFixed(3);
+    if(v===last)return;last=v;
+    list.forEach(function(el){el.style.setProperty('--bend',v)});
+  }
   ST.create({start:0,end:'max',onUpdate:function(self){
     var v=lim(self.getVelocity()/-950);
     if(Math.abs(v)>Math.abs(p.v)){
@@ -323,12 +329,13 @@ function lit(){
   var S=window.SplitText;
   if(!S)return;
   each($$('[data-lit]'),function(el){
-    /* текст для экранных читалок берём до деления: перенос строки (<br>) в нём становится пробелом */
-    var sp2,label=(el.innerText||el.textContent||'').replace(/\s+/g,' ').trim();
-    try{sp2=S.create(el,{type:'words',wordsClass:'lw',aria:'auto'})}catch(e){return}
+    /* слова — обычные <span> без aria-hidden: экранная читалка читает текст как есть.
+       (С aria:'auto' SplitText прячет слова и вешает подпись на сам элемент, а подпись
+       на <p> читалки не озвучивают — абзац становился немым.) */
+    var sp2;
+    try{sp2=S.create(el,{type:'words',wordsClass:'lw',tag:'span',aria:'none'})}catch(e){return}
     var ws=sp2.words||[];
     if(!ws.length)return;
-    if(label)el.setAttribute('aria-label',label);
     /* двигать слова не нужно, поэтому оставляем их обычным текстом: перенос строк остаётся прежним */
     ws.forEach(function(w){w.style.display='inline'});
     el.classList.add('lit-on');

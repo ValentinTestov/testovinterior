@@ -1,0 +1,40 @@
+name: Обновить статистику сайта
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 5 * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/public-stats.yml'
+      - '.github/scripts/update-public-stats.mjs'
+
+permissions:
+  contents: read
+concurrency:
+  group: public-site-statistics
+  cancel-in-progress: false
+
+jobs:
+  report:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Получить три показателя из Яндекс Метрики
+        id: stats
+        env:
+          METRIKA_TOKEN: ${{ secrets.METRIKA_TOKEN }}
+        run: node .github/scripts/update-public-stats.mjs
+
+      - name: Опубликовать сводку для обеих главных страниц
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.stats.outputs.artifact }}
+          path: ${{ runner.temp }}/public-stats.json
+          if-no-files-found: error
+          retention-days: 90

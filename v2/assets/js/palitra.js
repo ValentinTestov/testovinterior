@@ -245,30 +245,37 @@ function render(kind){
 document.getElementById('rooms').addEventListener('click',function(e){
   var b=e.target.closest('.chip');if(!b)return;
   var id=b.getAttribute('data-room'),i;
+  var changed = id !== st.room.id;
   for(i=0;i<ROOMS.length;i++)if(ROOMS[i].id===id)st.room=ROOMS[i];
   if(st.room.ok.indexOf(st.temp)<0){st.temp=st.room.ok[0];syncLight()}
   Array.prototype.forEach.call(this.querySelectorAll('.chip'),function(x){
     x.setAttribute('aria-pressed',String(x===b))});
   goal('palitra_pick');hap('light');render('pal');
+  if (changed) document.dispatchEvent(new Event('testov:tool-used'));
 });
 document.getElementById('pals').addEventListener('click',function(e){
   var b=e.target.closest('.chip');if(!b)return;
   var id=b.getAttribute('data-pal'),i;
+  var changed = id !== st.pal.id;
   for(i=0;i<PALS.length;i++)if(PALS[i].id===id)st.pal=PALS[i];
   Array.prototype.forEach.call(this.querySelectorAll('.chip'),function(x){
     x.setAttribute('aria-pressed',String(x===b))});
   goal('palitra_pick');hap('light');render('pal');
+  if (changed) document.dispatchEvent(new Event('testov:tool-used'));
 });
 document.getElementById('temps').addEventListener('click',function(e){
   var b=e.target.closest('button');if(!b)return;
+  var changed = st.temp !== Number(b.getAttribute('data-temp'));
   st.temp=parseInt(b.getAttribute('data-temp'),10);syncLight();
   goal('palitra_light');hap('light');render('light');
+  if (changed) document.dispatchEvent(new Event('testov:tool-used'));
 });
 document.getElementById('roll').addEventListener('click',function(){
   var pool=PALS.filter(function(p){return p.id!==st.pal.id});
   st.pal=pool[Math.floor(Math.random()*pool.length)];
   st.temp=st.room.ok[Math.floor(Math.random()*st.room.ok.length)];syncLight();
   paintChips();goal('palitra_pick');hap('medium');render('pal');
+  document.dispatchEvent(new Event('testov:tool-used'));
   toast('подобрано: ' + st.pal.n.toLowerCase());
 });
 document.getElementById('plist').addEventListener('click',function(e){

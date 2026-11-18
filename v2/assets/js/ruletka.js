@@ -563,6 +563,7 @@ function spin(){
         chime();
         if(MO&&VT.motion.sparks)VT.motion.sparks(spinBtn,30);     /* идея выпала — из кнопки летят искры света */
         var rec=recFromState();dbAdd(rec);showCard(rec);renderArchive();
+        document.dispatchEvent(new Event('testov:tool-used'));
         maybeCTA();
       }
     });

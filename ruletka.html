@@ -411,6 +411,7 @@ details.extra[open] summary::before{content:"– "}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="assets/site.js"></script>
+<script src="v2/assets/js/public-stats.js"></script>
 <script>
 (function(){
 "use strict";
@@ -962,6 +963,7 @@ function spin(){
         busy=false;spinBtn.disabled=false;spinLabel('крутить ещё');
         chime();
         var rec=recFromState();dbAdd(rec);showCard(rec);renderArchive();
+        document.dispatchEvent(new Event('testov:tool-used'));
         maybeCTA();
       }
     });

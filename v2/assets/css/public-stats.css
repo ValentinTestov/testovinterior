@@ -1,0 +1,54 @@
+.public-stats[hidden] { display: none; }
+.public-stats {
+  width: 100%;
+  margin: 1.25rem 0 0;
+  border-block: 1px solid var(--line);
+  padding: 1.15rem 0 .85rem;
+}
+.public-stats dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+.public-stats dl > div {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: .4rem;
+  padding-inline: clamp(.7rem, 2vw, 1.65rem);
+  border-inline-start: 1px solid var(--line);
+}
+.public-stats dl > div:first-child { padding-inline-start: 0; border: 0; }
+.public-stats dt { font-size: .9rem; line-height: 1.4; color: var(--dim, var(--ink-2)); }
+.public-stats dd {
+  margin: 0;
+  color: var(--brass-hi, rgb(var(--lamp)));
+  font-family: var(--roman, var(--f-disp));
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.public-stats small {
+  display: block;
+  margin-top: .85rem;
+  font-size: .77rem;
+  line-height: 1.55;
+  color: var(--dim, var(--ink-2));
+}
+@media (max-width: 600px) {
+  .public-stats { padding-top: .15rem; }
+  .public-stats dl { grid-template-columns: 1fr; }
+  .public-stats dl > div {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: .8rem;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    padding: .55rem 0;
+    text-align: left;
+  }
+  .public-stats dl > div:first-child { border-bottom: 1px solid var(--line); }
+  .public-stats dd { text-align: right; }
+}

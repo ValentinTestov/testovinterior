@@ -24,6 +24,7 @@
 <link rel="stylesheet" href="assets/css/fonts.css">
 <link rel="stylesheet" href="assets/css/core.css">
 <link rel="stylesheet" href="assets/css/home.css">
+<link rel="stylesheet" href="assets/css/public-stats.css">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     /* отказ от cookie (плашка внизу, assets/js/core.js) — счётчик не грузим */
@@ -344,6 +345,14 @@
       <span class="lab"><b>07</b> контакт</span>
       <h2>Обсудить проект</h2>
       <p data-lit>Расскажите про помещение и задачу — отвечу, что можно сделать, в какие сроки и сколько это будет стоить.</p>
+      <div class="public-stats" data-public-stats hidden>
+        <dl aria-label="Статистика сайта">
+          <div><dt>Посетили сайт</dt><dd data-stat="visitors"></dd></div>
+          <div><dt>Попробовали инструменты</dt><dd data-stat="tools"></dd></div>
+          <div><dt>Нажали «Написать в Telegram»</dt><dd data-stat="contacts"></dd></div>
+        </dl>
+        <small data-stat-period></small>
+      </div>
       <div class="btns"><a class="btn lamp" href="https://t.me/vtestov" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 3.5 10.6 13.4M20.5 3.5l-6 17-3.9-7.1-7.1-3.9z"/></svg> Написать в Telegram</a></div>
     </section>
   </div>
@@ -398,6 +407,7 @@
 <script src="assets/vendor/Draggable.min.js"></script>
 <script src="assets/vendor/InertiaPlugin.min.js"></script>
 <script src="assets/js/core.js"></script>
+<script src="assets/js/public-stats.js"></script>
 <script src="assets/js/motion.js"></script>
 <script src="assets/js/home.js"></script>
 <script type="module" src="assets/js/scene.js"></script>

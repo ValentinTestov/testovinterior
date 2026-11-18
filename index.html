@@ -20,6 +20,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/fonts.css">
 <link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="v2/assets/css/public-stats.css">
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     /* отказ от cookie (плашка внизу, assets/site.js) — счётчик не грузим */
@@ -159,6 +160,14 @@
   <div class="cta">
     <h2 style="margin-bottom:10px">Обсудить проект</h2>
     <p>Расскажите про помещение и задачу — отвечу, что можно сделать, в какие сроки и сколько это будет стоить.</p>
+    <div class="public-stats" data-public-stats hidden>
+      <dl aria-label="Статистика сайта">
+        <div><dt>Посетили сайт</dt><dd data-stat="visitors"></dd></div>
+        <div><dt>Попробовали инструменты</dt><dd data-stat="tools"></dd></div>
+        <div><dt>Нажали «Написать в Telegram»</dt><dd data-stat="contacts"></dd></div>
+      </dl>
+      <small data-stat-period></small>
+    </div>
     <div class="btns"><a class="btn solid" href="https://t.me/vtestov" target="_blank" rel="noopener">Написать в Telegram</a></div>
   </div>
 </div>
@@ -175,5 +184,6 @@
   </div>
 </footer>
 <script src="assets/site.js"></script>
+<script src="v2/assets/js/public-stats.js"></script>
 </body>
 </html>

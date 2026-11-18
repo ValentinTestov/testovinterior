@@ -303,6 +303,7 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="assets/site.js"></script>
+<script src="v2/assets/js/public-stats.js"></script>
 <script>
 (function(){
 "use strict";
@@ -647,6 +648,7 @@ listEl.addEventListener('click',function(e){
   row.querySelector('.inote').hidden=(next!=='bad');
   hap(next==='bad'?'medium':'light');
   goal('priemka_start');
+  if (next) document.dispatchEvent(new Event('testov:tool-used'));
   paintCounts();applyFilter();renderSum();save();
 });
 listEl.addEventListener('input',function(e){

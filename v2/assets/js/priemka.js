@@ -344,6 +344,7 @@ listEl.addEventListener('click',function(e){
   row.querySelector('.inote').hidden=(next!=='bad');
   hap(next==='bad'?'medium':'light');
   goal('priemka_start');
+  if (next) document.dispatchEvent(new Event('testov:tool-used'));
   paintCounts();applyFilter();renderSum();save();
 });
 listEl.addEventListener('input',function(e){

@@ -8,10 +8,20 @@ const token = (new URLSearchParams(fragment).get('access_token') ??
 if (!token) throw new Error('Добавьте METRIKA_TOKEN с правом metrika:read в секреты репозитория.');
 
 const counterId = '112145522';
-const visitorsSince = '2026-09-01'; // С этой даты счётчик 112145522 есть на сайте.
-const eventsSince = '2026-11-18'; // Первый выпуск с ti_tool_used и ti_contact_click.
 const through = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Moscow' }).format(new Date());
+const visitorsSince = twoMonthsBefore(through);
+const trackingStarted = '2026-11-18'; // Первый выпуск с ti_tool_used и ti_contact_click.
+const eventsSince = visitorsSince < trackingStarted ? trackingStarted : visitorsSince;
 const site = "EXISTS(ym:pv:URL=*'https://valentintestov.github.io/testovinterior/*')";
+
+function twoMonthsBefore(isoDay) {
+  const end = new Date(isoDay + 'T00:00:00Z');
+  const targetMonth = end.getUTCMonth() - 2;
+  const start = new Date(Date.UTC(end.getUTCFullYear(), targetMonth + 1, 0));
+  // Короткий месяц заканчивается 28/29/30-го. Обе границы входят в отчёт.
+  start.setUTCDate(Math.min(end.getUTCDate(), start.getUTCDate()));
+  return start.toISOString().slice(0, 10);
+}
 
 function request(url) {
   return fetch(url, {

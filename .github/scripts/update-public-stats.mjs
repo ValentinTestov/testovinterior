@@ -21,24 +21,29 @@ function request(url) {
   });
 }
 
-async function accessError(response) {
-  const body = await response.json().catch(() => null);
-  const invalid = 'Яндекс отклонил токен. Проверьте значение access_token в секрете METRIKA_TOKEN.';
-  if (response.status === 401 || body?.errors?.some(error => error.error_type === 'invalid_token')) return invalid;
+// В публичном журнале допустимы только документированные коды, без текста ответа Яндекса.
+const publicErrorTypes = new Set(['invalid_token', 'unauthorized', 'access_denied', 'invalid_parameter',
+  'missing_parameter', 'filter_limits', 'query_error', 'not_found']);
+function statusText(response, body) {
+  const code = Array.isArray(body?.errors)
+    ? body.errors.find(error => publicErrorTypes.has(error?.error_type))?.error_type
+    : undefined;
+  return 'HTTP ' + response.status + (code ? ' (' + code + ')' : '');
+}
 
-  // Проверяем доступ исключительно к счётчику сайта. В публичный журнал попадает только результат проверки.
+async function accessError(reportStatus) {
   const lookup = new URL('https://api-metrika.yandex.net/management/v1/counters');
   lookup.search = new URLSearchParams({ counter_ids: counterId, per_page: '1' });
-  const result = await request(lookup);
+  const result = await request(lookup).catch(() => null);
+  if (!result) return reportStatus + ' Отдельный запрос доступа к счётчику не получил ответа.';
   const list = await result.json().catch(() => null);
+  const summary = reportStatus + ' Проверка доступа к счётчику ' + counterId + ' — ' + statusText(result, list) + '. ';
   if (result.ok && Array.isArray(list?.counters)) {
-    return list.counters.some(counter => String(counter.id) === counterId)
-      ? 'Счётчик 112145522 доступен этому аккаунту, но Яндекс отказал в чтении отчёта.'
-      : 'Токен принят. Счётчика 112145522 нет среди доступных этому аккаунту.';
+    return summary + (list.counters.some(counter => String(counter.id) === counterId)
+      ? 'Счётчик доступен этому аккаунту. Яндекс отказал в чтении отчёта.'
+      : 'Счётчика нет среди доступных этому аккаунту.');
   }
-  if (list?.errors?.some(error => error.error_type === 'invalid_token')) return invalid;
-  return 'Проверка доступа к счётчику 112145522 вернула HTTP ' + result.status +
-    '. Проверьте право приложения metrika:read и аккаунт, выдавший токен.';
+  return summary + 'Для чтения нужны право приложения metrika:read и доступ аккаунта к счётчику.';
 }
 
 async function uniqueVisitors(since, parameter) {
@@ -49,8 +54,12 @@ async function uniqueVisitors(since, parameter) {
     filters: filter, timezone: '+03:00', accuracy: 'full'
   });
   const response = await request(url);
-  if (response.status === 401 || response.status === 403) throw new Error(await accessError(response));
-  if (!response.ok) throw new Error('Метрика вернула HTTP ' + response.status + ' для ' + (parameter || 'посещаемости'));
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    const summary = 'Отчёт ' + (parameter || 'посещаемости') + ' — ' + statusText(response, body) + '.';
+    if (response.status === 401 || response.status === 403) throw new Error(await accessError(summary));
+    throw new Error(summary);
+  }
   const report = await response.json();
   const value = report.totals?.[0];
   if (report.sampled || !Number.isSafeInteger(value) || value < 0) {
